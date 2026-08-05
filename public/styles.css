@@ -1,0 +1,95 @@
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.15);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.3);
+}
+
+/* Custom shadow animations and glow effects */
+.shadow-glow {
+    box-shadow: 0 0 15px currentColor;
+}
+
+/* Full-Screen Breathing Animation */
+@keyframes breathing {
+    0% {
+        transform: scale(0.92);
+        opacity: 0.6;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+    50% {
+        transform: scale(1.08);
+        opacity: 1;
+        box-shadow: 0 0 45px rgba(99, 102, 241, 0.5);
+    }
+    100% {
+        transform: scale(0.92);
+        opacity: 0.6;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+}
+
+.breathing-ring {
+    animation: breathing 4s ease-in-out infinite;
+}
+
+/* Subtle page fade-in effect */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Smooth active status rings */
+.active-status-glow {
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Confetti keyframe animation for upgrade celebration */
+@keyframes confetti-pop {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+.celebration-sparkle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    animation: confetti-pop 0.8s ease-out forwards;
+}
+
+/* Phone screen-specific safe padding/styling overrides */
+#phone-app-container {
+    padding-top: env(safe-area-inset-top, 32px);
+    padding-bottom: env(safe-area-inset-bottom, 24px);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
