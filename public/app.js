@@ -57,6 +57,19 @@ function saveState() {
     updateSaaSCompanionUI();
 }
 
+// Clear and delete all account data immediately
+function deleteAccountAndAllData() {
+    if (confirm('Are you absolutely sure you want to delete your account and wipe all stored data? This cannot be undone.')) {
+        localStorage.removeItem('pause_saas_state');
+        state = { ...DEFAULT_STATE };
+        state.onboarded = false;
+        currentScreen = 'onboarding-1';
+        saveState();
+        renderCurrentScreen();
+        alert('All locally saved logs, trends, and account data have been completely deleted.');
+    }
+}
+
 // Logging helper
 function logAction(action, result) {
     const now = new Date();
@@ -775,6 +788,13 @@ function renderCurrentScreen() {
                                 "I'm trying to scroll less. 🧭 @PauseApp"
                             </div>
                         </div>
+
+                        <!-- Mandatory Account Deletion link -->
+                        <div class="pt-2 border-t border-slate-900">
+                            <button onclick="deleteAccountAndAllData()" class="w-full bg-rose-950/30 hover:bg-rose-950/50 border border-rose-500/20 text-rose-300 font-bold py-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i> Delete All My Data &amp; Account
+                            </button>
+                        </div>
                     </div>
 
                     <button onclick="changeScreen('home')" class="w-full bg-slate-900 hover:bg-slate-800 border border-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition-colors mt-3">
@@ -868,6 +888,7 @@ function changeScreen(screenName) {
     renderCurrentScreen();
 }
 
+// Managed app selections
 function toggleManagedApp(app) {
     const idx = state.managedApps.indexOf(app);
     if (idx > -1) {
