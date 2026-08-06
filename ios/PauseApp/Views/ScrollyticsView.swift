@@ -154,6 +154,8 @@ struct SettingsView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var showingDeleteConfirmation = false
 
+    let allAvailableApps = ["Instagram", "TikTok", "Twitter / X", "YouTube", "Reddit", "Snapchat", "Facebook"]
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
@@ -170,6 +172,48 @@ struct SettingsView: View {
                     Spacer()
                 }
                 .padding(.horizontal, 4)
+
+                // Managed Apps Configuration list - EDITABLE IN SETTINGS
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("EDIT MANAGED SOCIAL APPS")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.slate500)
+                        .tracking(1)
+
+                    VStack(spacing: 8) {
+                        ForEach(allAvailableApps, id: \.self) { app in
+                            Button(action: {
+                                if state.managedApps.contains(app) {
+                                    state.managedApps.removeAll { $0 == app }
+                                    state.logAction(appName: app, action: "Settings Unmanaged", result: "Removed")
+                                } else {
+                                    state.managedApps.append(app)
+                                    state.logAction(appName: app, action: "Settings Managed", result: "Added")
+                                }
+                            }) {
+                                HStack {
+                                    Text(app)
+                                        .font(.system(size: 13, weight: .semibold))
+                                        .foregroundColor(.white)
+                                    Spacer()
+                                    Image(systemName: state.managedApps.contains(app) ? "checkmark.circle.fill" : "circle")
+                                        .foregroundColor(state.managedApps.contains(app) ? .indigo : .slate600)
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 10)
+                                .background(state.managedApps.contains(app) ? Color.indigo.opacity(0.08) : Color.slate950.opacity(0.4))
+                                .cornerRadius(10)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(state.managedApps.contains(app) ? Color.indigo.opacity(0.3) : Color.slate800, lineWidth: 1)
+                                )
+                            }
+                        }
+                    }
+                }
+                .padding(16)
+                .background(Color.slate900)
+                .cornerRadius(16)
 
                 // Custom Pause Selection
                 VStack(alignment: .leading, spacing: 10) {
@@ -520,7 +564,9 @@ struct PausePlusView: View {
                                 case .verified(let transaction):
                                     state.hasPremium = true
                                     state.logAction(appName: "StoreKit Engine", action: "Purchase Verified", result: "Active")
-                                    transaction.finish()
+                                    Task {
+                                        await transaction.finish()
+                                    }
                                 case .unverified(_, let error):
                                     state.logAction(appName: "StoreKit Engine", action: "Purchase Failed Verification", result: error.localizedDescription)
                                 }

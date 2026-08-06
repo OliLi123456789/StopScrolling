@@ -6,7 +6,7 @@ struct OnboardingView: View {
     @State private var step = 1
     @State private var tempPauseDuration = 10
 
-    let allAvailableApps = ["Instagram", "TikTok", "Twitter / X", "YouTube", "Reddit", "Facebook"]
+    let allAvailableApps = ["Instagram", "TikTok", "Twitter / X", "YouTube", "Reddit", "Snapchat", "Facebook"]
 
     var body: some View {
         ZColor.background

@@ -3,7 +3,7 @@
 
 const DEFAULT_STATE = {
     onboarded: false,
-    managedApps: ['Instagram', 'TikTok', 'Twitter / X', 'YouTube', 'Reddit'],
+    managedApps: ['Instagram', 'TikTok', 'Twitter / X', 'YouTube', 'Reddit', 'Snapchat'],
     pauseDuration: 10, // seconds
     hasPremium: false,
     streak: 3, // starting streak
@@ -306,7 +306,7 @@ function renderCurrentScreen() {
                         </div>
 
                         <div class="space-y-2 max-h-[260px] overflow-y-auto pr-1">
-                            ${['Instagram', 'TikTok', 'Twitter / X', 'YouTube', 'Reddit', 'Facebook'].map(app => {
+                            ${['Instagram', 'TikTok', 'Twitter / X', 'YouTube', 'Reddit', 'Snapchat', 'Facebook'].map(app => {
                                 const checked = state.managedApps.includes(app);
                                 return `
                                     <label class="flex items-center justify-between p-3 bg-slate-900 border ${checked ? 'border-indigo-500/30 bg-indigo-950/10' : 'border-slate-800'} rounded-xl cursor-pointer transition-colors">
@@ -909,6 +909,7 @@ function setPauseDuration(sec) {
     renderCurrentScreen();
 }
 
+// Welcome onboarding
 function completeOnboarding() {
     state.onboarded = true;
     saveState();

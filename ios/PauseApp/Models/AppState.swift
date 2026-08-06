@@ -90,7 +90,7 @@ class AppState: ObservableObject {
 
     init() {
         self.isOnboarded = UserDefaults.standard.bool(forKey: "isOnboarded")
-        self.managedApps = UserDefaults.standard.stringArray(forKey: "managedApps") ?? ["Instagram", "TikTok", "Twitter / X", "YouTube", "Reddit"]
+        self.managedApps = UserDefaults.standard.stringArray(forKey: "managedApps") ?? ["Instagram", "TikTok", "Twitter / X", "YouTube", "Reddit", "Snapchat"]
         self.pauseDuration = UserDefaults.standard.integer(forKey: "pauseDuration") == 0 ? 10 : UserDefaults.standard.integer(forKey: "pauseDuration")
         self.hasPremium = UserDefaults.standard.bool(forKey: "hasPremium")
         self.streak = UserDefaults.standard.integer(forKey: "streak") == 0 ? 3 : UserDefaults.standard.integer(forKey: "streak")
@@ -140,7 +140,7 @@ class AppState: ObservableObject {
 
     func resetState() {
         self.isOnboarded = false
-        self.managedApps = ["Instagram", "TikTok", "Twitter / X", "YouTube", "Reddit"]
+        self.managedApps = ["Instagram", "TikTok", "Twitter / X", "YouTube", "Reddit", "Snapchat"]
         self.pauseDuration = 10
         self.hasPremium = false
         self.streak = 3
