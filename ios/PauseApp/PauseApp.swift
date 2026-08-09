@@ -2,13 +2,17 @@ import SwiftUI
 
 // Theme helper defines consistent color tokens as solid fallback code colors.
 struct ZColor {
-    static let background = Color.slate950
+    static let background = Color.charcoal
     static let slate400 = Color.slate400
     static let slate500 = Color.slate500
     static let slate600 = Color.slate600
     static let slate800 = Color.slate800
     static let slate900 = Color.slate900
     static let slate950 = Color.slate950
+    static let rawBrass = Color.rawBrass
+    static let charcoal = Color.charcoal
+    static let charcoalLight = Color.charcoalLight
+    static let desaturatedGreen = Color.desaturatedGreen
 }
 
 // SwiftUI Color extension mapping hex-like fallback definitions.
@@ -23,8 +27,14 @@ extension Color {
     static let rose = Color(red: 244/255, green: 63/255, blue: 94/255)
     static let amber = Color(red: 245/255, green: 158/255, blue: 11/255)
 
+    // Industrial Mindfulness custom color tokens
+    static let rawBrass = Color(red: 184/255, green: 134/255, blue: 11/255)
+    static let charcoal = Color(red: 26/255, green: 26/255, blue: 26/255)
+    static let charcoalLight = Color(red: 35/255, green: 35/255, blue: 35/255)
+    static let desaturatedGreen = Color(red: 107/255, green: 143/255, blue: 113/255)
+
     static var background: Color {
-        return Color.slate950
+        return Color.charcoal
     }
 }
 
@@ -77,7 +87,7 @@ struct ContentView: View {
                                 }
                                 .tag(2)
                         }
-                        .accentColor(.indigo)
+                        .accentColor(.rawBrass)
                     }
                     .navigationBarHidden(true)
                 }

@@ -72,6 +72,34 @@ class AppState: ObservableObject {
         didSet { UserDefaults.standard.set(quietHoursEnd, forKey: "quietHoursEnd") }
     }
 
+    @Published var tokens: Int {
+        didSet { UserDefaults.standard.set(tokens, forKey: "tokens") }
+    }
+
+    @Published var selectedBonsaiSeason: String {
+        didSet { UserDefaults.standard.set(selectedBonsaiSeason, forKey: "selectedBonsaiSeason") }
+    }
+
+    @Published var unlockedSeasons: [String] {
+        didSet { UserDefaults.standard.set(unlockedSeasons, forKey: "unlockedSeasons") }
+    }
+
+    @Published var koiColor: String {
+        didSet { UserDefaults.standard.set(koiColor, forKey: "koiColor") }
+    }
+
+    @Published var unlockedKoiColors: [String] {
+        didSet { UserDefaults.standard.set(unlockedKoiColors, forKey: "unlockedKoiColors") }
+    }
+
+    @Published var simulatedDaysElapsed: Int {
+        didSet { UserDefaults.standard.set(simulatedDaysElapsed, forKey: "simulatedDaysElapsed") }
+    }
+
+    @Published var checkedInCount: Int {
+        didSet { UserDefaults.standard.set(checkedInCount, forKey: "checkedInCount") }
+    }
+
     @Published var scrollSessions: [ScrollSession] {
         didSet {
             if let encoded = try? JSONEncoder().encode(scrollSessions) {
@@ -103,6 +131,15 @@ class AppState: ObservableObject {
         self.enableQuietHours = UserDefaults.standard.bool(forKey: "enableQuietHours")
         self.quietHoursStart = UserDefaults.standard.string(forKey: "quietHoursStart") ?? "09:00"
         self.quietHoursEnd = UserDefaults.standard.string(forKey: "quietHoursEnd") ?? "17:00"
+
+        // Overhaul Garden state defaults
+        self.tokens = UserDefaults.standard.object(forKey: "tokens") == nil ? 15 : UserDefaults.standard.integer(forKey: "tokens")
+        self.selectedBonsaiSeason = UserDefaults.standard.string(forKey: "selectedBonsaiSeason") ?? "Spring"
+        self.unlockedSeasons = UserDefaults.standard.stringArray(forKey: "unlockedSeasons") ?? ["Spring"]
+        self.koiColor = UserDefaults.standard.string(forKey: "koiColor") ?? "Orange"
+        self.unlockedKoiColors = UserDefaults.standard.stringArray(forKey: "unlockedKoiColors") ?? ["Orange"]
+        self.simulatedDaysElapsed = UserDefaults.standard.object(forKey: "simulatedDaysElapsed") == nil ? 1 : UserDefaults.standard.integer(forKey: "simulatedDaysElapsed")
+        self.checkedInCount = UserDefaults.standard.object(forKey: "checkedInCount") == nil ? 4 : UserDefaults.standard.integer(forKey: "checkedInCount")
 
         // Load Scroll Sessions
         if let data = UserDefaults.standard.data(forKey: "scrollSessions"),
@@ -152,6 +189,13 @@ class AppState: ObservableObject {
         self.enableQuietHours = false
         self.quietHoursStart = "09:00"
         self.quietHoursEnd = "17:00"
+        self.tokens = 15
+        self.selectedBonsaiSeason = "Spring"
+        self.unlockedSeasons = ["Spring"]
+        self.koiColor = "Orange"
+        self.unlockedKoiColors = ["Orange"]
+        self.simulatedDaysElapsed = 1
+        self.checkedInCount = 4
         self.scrollSessions = [
             ScrollSession(startTime: "08:00", endTime: "08:30", isActive: true),
             ScrollSession(startTime: "12:00", endTime: "13:00", isActive: false),
