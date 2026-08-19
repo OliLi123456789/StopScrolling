@@ -1,6 +1,6 @@
 import SwiftUI
 
-// PazuAppIconView displays a Shoulders-Up portrait of Pazu the Red Panda with equipped cosmetics, suitable for the dynamic App Icon
+// PazuAppIconView displays a Shoulders-Up portrait of Pazu the Red Panda with equipped cosmetics and Pazu's active facial expression.
 struct PazuAppIconView: View {
     @ObservedObject var state: AppState
     var iconSize: CGFloat = 60
@@ -21,7 +21,7 @@ struct PazuAppIconView: View {
                         .stroke(Color.rawBrass.opacity(0.4), lineWidth: 1.5)
                 )
 
-            // Shoulders-Up Pazu Portrait
+            // Shoulders-Up Pazu Portrait with Active Expression & Cosmetics
             VStack(spacing: -4) {
                 ZStack {
                     // Hat Cosmetic Overlay
@@ -50,9 +50,9 @@ struct PazuAppIconView: View {
                             .offset(y: -iconSize * 0.1)
                     }
 
-                    // Pazu Head & Shoulders Base
-                    Text(getPazuShouldersUpEmoji())
-                        .font(.system(size: iconSize * 0.55))
+                    // Pazu Head & Shoulders Base with Active Expression
+                    Text(getPazuExpressionEmoji())
+                        .font(.system(size: iconSize * 0.52))
 
                     // Scarf Cosmetic Overlay
                     if state.pazuScarf == "Red Scarf" {
@@ -67,19 +67,20 @@ struct PazuAppIconView: View {
         .shadow(color: Color.black.opacity(0.3), radius: 4, x: 0, y: 2)
     }
 
-    private func getPazuShouldersUpEmoji() -> String {
+    // Dynamic expression mapping for Shoulders-Up App Icon
+    private func getPazuExpressionEmoji() -> String {
         switch state.currentPazuState {
-        case .idle: return "🐾"
-        case .happy: return "🐾✨"
-        case .proud: return "🏆🐾"
-        case .clumsy: return "💥🐾"
-        case .sleeping: return "💤🐾"
+        case .idle: return "😊🐾"
+        case .happy: return "😁🐾"
+        case .proud: return "😏🐾"
+        case .clumsy: return "😵🐾"
+        case .sleeping: return "😴🐾"
         case .curious: return "🧐🐾"
-        case .excited: return "🎉🐾"
+        case .excited: return "🤩🐾"
         case .gentleDisappointment: return "🥺🐾"
         case .meditating: return "🧘🐾"
-        case .playing: return "🍃🐾"
-        case .eating: return "🎋🐾"
+        case .playing: return "😄🐾"
+        case .eating: return "😋🐾"
         case .greeting: return "👋🐾"
         case .watching: return "👀🐾"
         }

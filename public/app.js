@@ -163,14 +163,12 @@ document.addEventListener('DOMContentLoaded', () => {
         currentScreen = 'home';
     }
 
-    // Check if on /sandbox path to open sandbox tab
     if (window.location.pathname === '/sandbox') {
         if (typeof switchTab === 'function') switchTab('sandbox-tab');
     }
 
     renderCurrentScreen();
 
-    // Reset button
     const resetBtn = document.getElementById('reset-btn');
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
@@ -184,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Premium upgrade toggle
     const upgradeToggle = document.getElementById('sandbox-upgrade-toggle');
     if (upgradeToggle) {
         upgradeToggle.addEventListener('click', () => {
@@ -195,7 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Fast-forward Sim 1 Day
     const ffBtn = document.getElementById('fast-forward-btn');
     if (ffBtn) {
         ffBtn.addEventListener('click', () => {
@@ -323,7 +319,7 @@ function startScrollSimulator(appName, method = 'touch', selectedIntent = null) 
             const timerEl = document.getElementById('feed-timer-countdown');
             if (timerEl) {
                 const mins = Math.floor(feedRemainingSeconds / 60);
-                const secs = feedRemainingSeconds % 60;
+                const secs = Math.floor(feedRemainingSeconds % 60);
                 timerEl.innerText = `${mins}:${secs.toString().padStart(2, '0')}`;
             }
         }
@@ -390,30 +386,30 @@ function triggerHardwareBypass() {
     renderCurrentScreen();
 }
 
-// Render Shoulders-Up Pazu Red Panda App Icon Viewport
+// Render Shoulders-Up Pazu Red Panda App Icon Viewport with Matching Expressions
 function renderPazuCharacter() {
     const hatDecoration = state.pazuHat === 'Leaf Crown' ? '👑🍃' : state.pazuHat === 'Straw Hat' ? '👒' : state.pazuHat === 'Wizard Hat' ? '🧙' : '';
     const glassesDecoration = state.pazuGlasses === 'Round Glasses' ? '👓' : state.pazuGlasses === 'Sunglasses' ? '🕶️' : '';
     const scarfDecoration = state.pazuScarf === 'Red Scarf' ? '🧣' : '';
 
-    let pazuEmoji = '🐾';
+    let pazuEmoji = '😊🐾';
     let pazuActionText = 'Pazu is resting in the Zen Garden';
 
     switch (state.pazuState) {
         case 'happy':
-            pazuEmoji = '🐾✨';
+            pazuEmoji = '😁🐾';
             pazuActionText = 'Pazu waves happily! "I\'m happy to see you!"';
             break;
         case 'proud':
-            pazuEmoji = '🏆🐾';
+            pazuEmoji = '😏🐾';
             pazuActionText = 'Pazu stands proud of your mindful streak!';
             break;
         case 'clumsy':
-            pazuEmoji = '💥🐾';
+            pazuEmoji = '😵🐾';
             pazuActionText = 'Pazu tripped over its bushy tail! "Eep!" (Clumsy 5% chance)';
             break;
         case 'sleeping':
-            pazuEmoji = '💤🐾';
+            pazuEmoji = '😴🐾';
             pazuActionText = 'Pazu is curled up asleep under the tree...';
             break;
         case 'curious':
@@ -421,23 +417,35 @@ function renderPazuCharacter() {
             pazuActionText = 'Pazu is curiously exploring the bamboo grove...';
             break;
         case 'excited':
-            pazuEmoji = '🎉🐾';
+            pazuEmoji = '🤩🐾';
             pazuActionText = 'Pazu is bouncing with excitement!';
+            break;
+        case 'gentleDisappointment':
+            pazuEmoji = '🥺🐾';
+            pazuActionText = 'Pazu missed you, but is ready when you are.';
             break;
         case 'meditating':
             pazuEmoji = '🧘🐾';
             pazuActionText = 'Pazu is meditating peacefully in the garden...';
             break;
         case 'playing':
-            pazuEmoji = '🍃🐾';
+            pazuEmoji = '😄🐾';
             pazuActionText = 'Pazu is chasing falling cherry blossom leaves!';
             break;
         case 'eating':
-            pazuEmoji = '🎋🐾';
+            pazuEmoji = '😋🐾';
             pazuActionText = 'Pazu is munching on fresh bamboo treats!';
             break;
+        case 'greeting':
+            pazuEmoji = '👋🐾';
+            pazuActionText = 'Pazu is waving happily at you!';
+            break;
+        case 'watching':
+            pazuEmoji = '👀🐾';
+            pazuActionText = 'Pazu is observing your session...';
+            break;
         default:
-            pazuEmoji = '🐾';
+            pazuEmoji = '😊🐾';
             pazuActionText = 'Pazu the Red Panda is breathing calmly.';
             break;
     }
@@ -457,7 +465,7 @@ function renderPazuCharacter() {
                     <span class="text-3xl animate-bounce" style="animation-duration: 4s;">${pazuEmoji}</span>
                     <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs">${scarfDecoration}</span>
                 </div>
-                <div class="text-[11px] font-black text-white mt-1.5 tracking-wide">Pazu Shoulders-Up App Icon</div>
+                <div class="text-[11px] font-black text-white mt-1.5 tracking-wide">Pazu App Icon</div>
                 <div class="text-[9px] text-[#B8860B] font-medium px-2 leading-tight mt-0.5">${pazuActionText}</div>
             </div>
         </div>
