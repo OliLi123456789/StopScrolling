@@ -1,6 +1,6 @@
 import SwiftUI
 
-// Pazu the Clumsy Zen Red Panda character view
+// Pazu the Clumsy Zen Red Panda character view & shoulders-up portrait
 struct PazuCharacterView: View {
     @ObservedObject var state: AppState
     @State private var bounceOffset: CGFloat = 0.0
@@ -25,48 +25,9 @@ struct PazuCharacterView: View {
                     .offset(x: 70)
                     .rotationEffect(.degrees(tailAngle * 10))
 
-                // Pazu Character Stack
+                // Shoulders-Up Dynamic App Icon Badge
                 VStack(spacing: 2) {
-                    ZStack {
-                        // Hat Cosmetic
-                        if state.pazuHat == "Leaf Crown" {
-                            Text("👑🍃")
-                                .font(.system(size: 14))
-                                .offset(y: -22)
-                        } else if state.pazuHat == "Straw Hat" {
-                            Text("👒")
-                                .font(.system(size: 18))
-                                .offset(y: -22)
-                        } else if state.pazuHat == "Wizard Hat" {
-                            Text("🧙")
-                                .font(.system(size: 18))
-                                .offset(y: -22)
-                        }
-
-                        // Glasses Cosmetic
-                        if state.pazuGlasses == "Round Glasses" {
-                            Text("👓")
-                                .font(.system(size: 14))
-                                .offset(y: -6)
-                        } else if state.pazuGlasses == "Sunglasses" {
-                            Text("🕶️")
-                                .font(.system(size: 14))
-                                .offset(y: -6)
-                        }
-
-                        // Main Character Face & Body State Expression
-                        Text(getPazuEmoji())
-                            .font(.system(size: 42))
-                            .offset(y: bounceOffset)
-
-                        // Scarf Cosmetic
-                        if state.pazuScarf == "Red Scarf" {
-                            Text("🧣")
-                                .font(.system(size: 16))
-                                .offset(y: 16)
-                        }
-                    }
-                    .frame(height: 60)
+                    PazuAppIconView(state: state, iconSize: 72)
 
                     Text("Pazu")
                         .font(.system(size: 12, weight: .bold))
@@ -86,24 +47,6 @@ struct PazuCharacterView: View {
                 bounceOffset = -4.0
                 tailAngle = 36.0
             }
-        }
-    }
-
-    private func getPazuEmoji() -> String {
-        switch state.currentPazuState {
-        case .idle: return "🐾"
-        case .happy: return "🐾✨"
-        case .proud: return "🏆🐾"
-        case .clumsy: return "💥🐾"
-        case .sleeping: return "💤🐾"
-        case .curious: return "🧐🐾"
-        case .excited: return "🎉🐾"
-        case .gentleDisappointment: return "🥺🐾"
-        case .meditating: return "🧘🐾"
-        case .playing: return "🍃🐾"
-        case .eating: return "🎋🐾"
-        case .greeting: return "👋🐾"
-        case .watching: return "👀🐾"
         }
     }
 

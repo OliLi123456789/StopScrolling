@@ -90,7 +90,6 @@ function loadState() {
     } else {
         state = { ...DEFAULT_STATE };
     }
-    // Set fallback tokens & Pazu attributes if not exists
     if (state.tokens === undefined) state.tokens = 15;
     if (state.selectedBonsaiSeason === undefined) state.selectedBonsaiSeason = 'Spring';
     if (state.unlockedSeasons === undefined) state.unlockedSeasons = ['Spring'];
@@ -158,51 +157,64 @@ let ghostCheckInTimer = null;
 document.addEventListener('DOMContentLoaded', () => {
     loadState();
 
-    // Check if onboarded
     if (!state.onboarded) {
         currentScreen = 'onboarding-1';
     } else {
         currentScreen = 'home';
     }
 
+    // Check if on /sandbox path to open sandbox tab
+    if (window.location.pathname === '/sandbox') {
+        if (typeof switchTab === 'function') switchTab('sandbox-tab');
+    }
+
     renderCurrentScreen();
 
     // Reset button
-    document.getElementById('reset-btn').addEventListener('click', () => {
-        if (confirm('Reset entire sandbox simulator to default?')) {
-            localStorage.removeItem('pause_saas_state');
-            state = { ...DEFAULT_STATE };
-            currentScreen = 'onboarding-1';
-            saveState();
-            renderCurrentScreen();
-        }
-    });
+    const resetBtn = document.getElementById('reset-btn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            if (confirm('Reset entire sandbox simulator to default?')) {
+                localStorage.removeItem('pause_saas_state');
+                state = { ...DEFAULT_STATE };
+                currentScreen = 'onboarding-1';
+                saveState();
+                renderCurrentScreen();
+            }
+        });
+    }
 
     // Premium upgrade toggle
-    document.getElementById('sandbox-upgrade-toggle').addEventListener('click', () => {
-        state.hasPremium = !state.hasPremium;
-        logAction('Sandbox Mode', `Subscription Tier toggled to: ${state.hasPremium ? 'Premium (Pause+)' : 'Free Tier'}`);
-        saveState();
-        renderCurrentScreen();
-    });
+    const upgradeToggle = document.getElementById('sandbox-upgrade-toggle');
+    if (upgradeToggle) {
+        upgradeToggle.addEventListener('click', () => {
+            state.hasPremium = !state.hasPremium;
+            logAction('Sandbox Mode', `Subscription Tier toggled to: ${state.hasPremium ? 'Premium (Pause+)' : 'Free Tier'}`);
+            saveState();
+            renderCurrentScreen();
+        });
+    }
 
     // Fast-forward Sim 1 Day
-    document.getElementById('fast-forward-btn').addEventListener('click', () => {
-        state.dailyScrollTime += Math.floor(Math.random() * 20) + 15;
-        state.longestSession = Math.max(state.longestSession, Math.floor(Math.random() * 10) + 15);
-        state.nudgesTriggered += Math.floor(Math.random() * 4) + 1;
-        state.nudgesResisted += Math.floor(Math.random() * 3);
-        state.streak += 1;
-        state.tokens += 5; // Awarded for progression daily
-        state.simulatedDaysElapsed += 1; // Track days for Day 8 Curiosity Nudge
-        updatePazuBehavior();
-        logAction('Simulation Engine', `Simulated 1 day of usage patterns. Total Simulated Days: ${state.simulatedDaysElapsed}`);
-        saveState();
-        renderCurrentScreen();
-    });
+    const ffBtn = document.getElementById('fast-forward-btn');
+    if (ffBtn) {
+        ffBtn.addEventListener('click', () => {
+            state.dailyScrollTime += Math.floor(Math.random() * 20) + 15;
+            state.longestSession = Math.max(state.longestSession, Math.floor(Math.random() * 10) + 15);
+            state.nudgesTriggered += Math.floor(Math.random() * 4) + 1;
+            state.nudgesResisted += Math.floor(Math.random() * 3);
+            state.streak += 1;
+            state.tokens += 5;
+            state.simulatedDaysElapsed += 1;
+            updatePazuBehavior();
+            logAction('Simulation Engine', `Simulated 1 day of usage patterns. Total Simulated Days: ${state.simulatedDaysElapsed}`);
+            saveState();
+            renderCurrentScreen();
+        });
+    }
 });
 
-// Play beautiful haptic simulated click audio
+// Play haptic audio feedback
 function playHapticFeedback(type) {
     try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -378,7 +390,7 @@ function triggerHardwareBypass() {
     renderCurrentScreen();
 }
 
-// Render Pazu Red Panda Character Vector Graphic
+// Render Shoulders-Up Pazu Red Panda App Icon Viewport
 function renderPazuCharacter() {
     const hatDecoration = state.pazuHat === 'Leaf Crown' ? '👑🍃' : state.pazuHat === 'Straw Hat' ? '👒' : state.pazuHat === 'Wizard Hat' ? '🧙' : '';
     const glassesDecoration = state.pazuGlasses === 'Round Glasses' ? '👓' : state.pazuGlasses === 'Sunglasses' ? '🕶️' : '';
@@ -437,15 +449,15 @@ function renderPazuCharacter() {
                 <div class="w-3 h-1.5 bg-[#B8860B] rounded-full opacity-70" style="margin-left: 8px;"></div>
             </div>
 
-            <!-- Pazu Character Visual -->
+            <!-- Shoulders-Up Pazu Dynamic App Icon Squircle Frame -->
             <div class="z-10 flex flex-col items-center text-center">
-                <div class="text-3xl relative animate-bounce" style="animation-duration: 4s;">
-                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-sm">${hatDecoration}</span>
-                    <span class="absolute top-1 left-1/2 -translate-x-1/2 text-xs">${glassesDecoration}</span>
-                    <span>${pazuEmoji}</span>
+                <div class="relative w-20 h-20 bg-gradient-to-br from-[#232323] to-[#1A1A1A] border-2 border-[#B8860B] rounded-3xl flex items-center justify-center shadow-lg">
+                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-xs">${hatDecoration}</span>
+                    <span class="absolute top-2 left-1/2 -translate-x-1/2 text-[10px]">${glassesDecoration}</span>
+                    <span class="text-3xl animate-bounce" style="animation-duration: 4s;">${pazuEmoji}</span>
                     <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs">${scarfDecoration}</span>
                 </div>
-                <div class="text-[11px] font-black text-white mt-2 tracking-wide">Pazu the Red Panda</div>
+                <div class="text-[11px] font-black text-white mt-1.5 tracking-wide">Pazu Shoulders-Up App Icon</div>
                 <div class="text-[9px] text-[#B8860B] font-medium px-2 leading-tight mt-0.5">${pazuActionText}</div>
             </div>
         </div>

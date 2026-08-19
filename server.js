@@ -13,6 +13,11 @@ app.use((req, res, next) => {
 // Serve static assets from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Explicit route for the sandbox
+app.get('/sandbox', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // Fallback to serving public/index.html safely for all requests
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
