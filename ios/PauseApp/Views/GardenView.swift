@@ -1,6 +1,6 @@
 import SwiftUI
 
-// GardenView displays Pazu the Red Panda inside the customizable Zen Garden environment
+// GardenView displays Pazu the Red Panda inside the Washi Paper Zen Garden environment
 struct GardenView: View {
     @ObservedObject var state: AppState
     @Binding var activeOverlayApp: String?
@@ -8,168 +8,104 @@ struct GardenView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Top header state
+                // Top Header
                 HStack {
                     HStack(spacing: 6) {
-                        Circle()
-                            .fill(Color.desaturatedGreen)
-                            .frame(width: 8, height: 8)
-                        Text("Pause Mode Active")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.desaturatedGreen)
-                            .textCase(.uppercase)
+                        Image(systemName: "flame.fill")
+                            .foregroundColor(.terracotta)
+                            .font(.system(size: 14))
+                        Text("Day \(state.streak)")
+                            .font(.custom("Inter", size: 15).weight(.semibold))
+                            .foregroundColor(.inkBlack)
                     }
+
                     Spacer()
 
-                    // Star Token balance
-                    HStack(spacing: 4) {
-                        Image(systemName: "star.fill")
-                            .font(.system(size: 10))
-                            .foregroundColor(.rawBrass)
-                        Text("\(state.tokens)")
-                            .font(.system(size: 11, weight: .bold, design: .monospaced))
-                            .foregroundColor(.white)
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.charcoalLight)
-                    .cornerRadius(20)
+                    HStack(spacing: 12) {
+                        Image(systemName: getMoodSymbol())
+                            .foregroundColor(.sageGreen)
+                            .font(.system(size: 14))
 
-                    NavigationLink(destination: SettingsView(state: state)) {
-                        Image(systemName: "gearshape")
-                            .font(.system(size: 16))
-                            .foregroundColor(.slate400)
+                        Text("★ \(state.tokens)")
+                            .font(.custom("JetBrainsMono", size: 15).weight(.bold))
+                            .foregroundColor(.terracotta)
+
+                        NavigationLink(destination: SettingsView(state: state)) {
+                            Image(systemName: "gearshape")
+                                .font(.system(size: 16))
+                                .foregroundColor(.inkMuted)
+                        }
                     }
                 }
-                .padding(.horizontal, 4)
+                .padding(.horizontal, 20)
+                .padding(.top, 10)
 
-                // Zen Garden Environment with Pazu
-                VStack(spacing: 12) {
+                // Zen Garden ZStack
+                ZStack {
+                    RakedSandView()
+                        .frame(height: 240)
+                        .padding(.horizontal, 12)
+
+                    BambooGroveView()
+                        .offset(y: -30)
+                        .opacity(0.5)
+
+                    HStack {
+                        Spacer()
+                        ZenTreeView()
+                            .offset(x: -20, y: 10)
+                        Spacer()
+                        KoiPondView()
+                            .offset(x: 20, y: 30)
+                        Spacer()
+                    }
+
                     PazuCharacterView(state: state)
-
-                    // Garden Tree & Pond attributes summary
-                    HStack(spacing: 12) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "leaf")
-                                .foregroundColor(.rawBrass)
-                                .font(.system(size: 10))
-                            Text("Tree: \(state.gardenTree)")
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundColor(.slate300)
-                        }
-
-                        Text("•")
-                            .foregroundColor(.slate600)
-
-                        HStack(spacing: 4) {
-                            Image(systemName: "drop")
-                                .foregroundColor(.cyan)
-                                .font(.system(size: 10))
-                            Text("Pond: \(state.gardenPond)")
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundColor(.slate300)
-                        }
-                    }
+                        .zIndex(10)
                 }
+                .background(
+                    RoundedRectangle(cornerRadius: 32)
+                        .fill(Color.pureWhite)
+                        .shadow(color: Color.paperShadow.opacity(0.6), radius: 12, x: 0, y: 8)
+                )
+                .padding(.horizontal, 16)
 
-                // Giant Daily Score
-                VStack(spacing: 4) {
-                    Text("Today's Scroll Time")
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
-                        .foregroundColor(.slate500)
-                        .textCase(.uppercase)
-
-                    HStack(alignment: .lastTextBaseline, spacing: 4) {
-                        Text("\(state.dailyScrollMinutes)")
-                            .font(.system(size: 64, weight: .black, design: .rounded))
-                            .foregroundColor(.white)
-                        Text("Minutes")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(.slate400)
-                    }
-
-                    Text("Mindful choices: \(state.nudgesResisted) of \(state.nudgesTriggered) trigger gates")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.rawBrass)
-                }
-                .padding(.vertical, 4)
-
-                // Stats Strip
-                HStack(spacing: 12) {
-                    HStack(spacing: 12) {
-                        Image(systemName: "flame.fill")
-                            .foregroundColor(.rawBrass)
-                            .frame(width: 36, height: 36)
-                            .background(Color.rawBrass.opacity(0.1))
-                            .cornerRadius(10)
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Streak")
-                                .font(.system(size: 11))
-                                .foregroundColor(.slate500)
-                            Text("\(state.streak) Mindful Days")
-                                .font(.system(size: 13, weight: .bold))
-                                .foregroundColor(.white)
-                        }
+                // Primary CTA
+                Button(action: {
+                    activeOverlayApp = state.managedApps.first ?? "Instagram"
+                }) {
+                    HStack {
+                        Image(systemName: "leaf.fill")
+                        Text("Start Mindful Session")
                         Spacer()
+                        Image(systemName: "arrow.right.circle.fill")
+                            .font(.system(size: 20))
                     }
-                    .padding(12)
-                    .background(Color.charcoalLight)
-                    .cornerRadius(14)
-
-                    HStack(spacing: 12) {
-                        Image(systemName: "calendar")
-                            .foregroundColor(.rawBrass)
-                            .frame(width: 36, height: 36)
-                            .background(Color.rawBrass.opacity(0.1))
-                            .cornerRadius(10)
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Next Session")
-                                .font(.system(size: 11))
-                                .foregroundColor(.slate500)
-                            Text("19:00 PM")
-                                .font(.system(size: 13, weight: .bold))
-                                .foregroundColor(.white)
-                        }
-                        Spacer()
-                    }
-                    .padding(12)
-                    .background(Color.charcoalLight)
-                    .cornerRadius(14)
+                    .font(.custom("Inter", size: 17).weight(.semibold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
+                    .background(
+                        Capsule()
+                            .fill(Color.terracotta)
+                            .shadow(color: Color.terracotta.opacity(0.35), radius: 8, x: 0, y: 4)
+                    )
                 }
-
-                // App Launch Simulators
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Simulate Social App Open")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.slate300)
-
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                        ForEach(state.managedApps, id: \.self) { app in
-                            Button(action: {
-                                activeOverlayApp = app
-                            }) {
-                                HStack {
-                                    Image(systemName: "iphone.badge.play")
-                                        .foregroundColor(.rawBrass)
-                                        .font(.system(size: 12))
-                                    Text(app)
-                                        .font(.system(size: 12, weight: .semibold))
-                                        .foregroundColor(.white)
-                                        .lineLimit(1)
-                                    Spacer()
-                                }
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 12)
-                                .background(Color.charcoalLight)
-                                .cornerRadius(12)
-                            }
-                        }
-                    }
-                }
+                .padding(.horizontal, 24)
+                .padding(.vertical, 8)
             }
-            .padding(16)
+            .padding(.bottom, 20)
+        }
+        .background(Color.washiPaper)
+    }
+
+    private func getMoodSymbol() -> String {
+        switch state.currentPazuState {
+        case .happy, .proud, .excited: return "sparkles"
+        case .sleeping: return "moon.fill"
+        case .meditating: return "leaf.fill"
+        case .clumsy: return "exclamationmark.triangle"
+        default: return "sun.max.fill"
         }
     }
 }

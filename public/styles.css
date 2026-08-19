@@ -1,3 +1,22 @@
+/* Washi Paper Minimalism Custom Styles */
+
+:root {
+    --washi-paper: #F8F6F0;
+    --pure-white: #FFFFFF;
+    --paper-shadow: #E5E0D5;
+    --terracotta: #E07A5F;
+    --sage-green: #81B29A;
+    --dusty-blue: #68A2B9;
+    --ink-black: #2B2D42;
+    --ink-muted: #8D8F9A;
+    --paper-border: #E8E4D9;
+}
+
+body {
+    background-color: var(--washi-paper);
+    color: var(--ink-black);
+}
+
 /* Custom scrollbar styles */
 ::-webkit-scrollbar {
     width: 6px;
@@ -7,46 +26,46 @@
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.15);
+    background: rgba(141, 143, 154, 0.2);
     border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.3);
+    background: rgba(141, 143, 154, 0.4);
 }
 
-/* Custom shadow animations and glow effects */
-.shadow-glow {
-    box-shadow: 0 0 15px currentColor;
+/* Washi Paper soft card shadow */
+.paper-card {
+    background-color: var(--pure-white);
+    border: 1px solid var(--paper-border);
+    box-shadow: 0 8px 24px var(--paper-shadow);
+    border-radius: 20px;
 }
 
-/* Full-Screen Breathing Animation */
-@keyframes breathing {
+/* Breathing animation for Washi Paper gate */
+@keyframes washiBreathing {
     0% {
-        transform: scale(0.92);
-        opacity: 0.6;
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        transform: scale(0.95);
+        opacity: 0.7;
     }
     50% {
-        transform: scale(1.08);
+        transform: scale(1.05);
         opacity: 1;
-        box-shadow: 0 0 45px rgba(99, 102, 241, 0.5);
     }
     100% {
-        transform: scale(0.92);
-        opacity: 0.6;
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        transform: scale(0.95);
+        opacity: 0.7;
     }
 }
 
-.breathing-ring {
-    animation: breathing 4s ease-in-out infinite;
+.washi-breathing-ring {
+    animation: washiBreathing 4s ease-in-out infinite;
 }
 
-/* Subtle page fade-in effect */
+/* Page fade-in effect */
 @keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateY(6px);
+        transform: translateY(4px);
     }
     to {
         opacity: 1;
@@ -55,41 +74,12 @@
 }
 
 .animate-fade-in {
-    animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* Smooth active status rings */
-.active-status-glow {
-    box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
-}
-
-/* Confetti keyframe animation for upgrade celebration */
-@keyframes confetti-pop {
-    0% {
-        transform: scale(0.3);
-        opacity: 0;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 0;
-    }
-}
-
-.celebration-sparkle {
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    animation: confetti-pop 0.8s ease-out forwards;
-}
-
-/* Phone screen-specific safe padding/styling overrides */
 #phone-app-container {
     padding-top: env(safe-area-inset-top, 32px);
     padding-bottom: env(safe-area-inset-bottom, 24px);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--washi-paper);
+    color: var(--ink-black);
 }

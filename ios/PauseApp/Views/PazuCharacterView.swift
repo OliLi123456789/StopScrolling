@@ -1,80 +1,121 @@
 import SwiftUI
 
-// Pazu the Clumsy Zen Red Panda character view & shoulders-up portrait
+// PazuCharacterView procedurally renders Pazu the Red Panda using SwiftUI Canvas and vector shapes with ZERO emojis
 struct PazuCharacterView: View {
     @ObservedObject var state: AppState
-    @State private var bounceOffset: CGFloat = 0.0
-    @State private var tailAngle: Double = 0.0
+    @State private var walkCycleOffset: CGFloat = 0.0
 
     var body: some View {
         VStack(spacing: 8) {
             ZStack {
-                // Background Zen Garden Pond Circle
-                Circle()
-                    .fill(Color.charcoalLight.opacity(0.6))
-                    .frame(width: 160, height: 160)
-                    .overlay(
-                        Circle()
-                            .stroke(Color.rawBrass.opacity(0.15), lineWidth: 1)
-                    )
+                // Procedural Canvas Character
+                Canvas { context, size in
+                    let center = CGPoint(x: size.width / 2, y: size.height / 2 + 10)
 
-                // Orbiting Koi Fish Indicator
-                Circle()
-                    .fill(getKoiColor())
-                    .frame(width: 12, height: 8)
-                    .offset(x: 70)
-                    .rotationEffect(.degrees(tailAngle * 10))
+                    // 1. TAIL (S-curve)
+                    var tailPath = Path()
+                    tailPath.move(to: CGPoint(x: center.x - 20, y: center.y + 10))
+                    tailPath.addCurve(to: CGPoint(x: center.x - 45, y: center.y - 20),
+                                      control1: CGPoint(x: center.x - 30, y: center.y + 15),
+                                      control2: CGPoint(x: center.x - 50, y: center.y - 10))
+                    tailPath.addCurve(to: CGPoint(x: center.x - 20, y: center.y + 10),
+                                      control1: CGPoint(x: center.x - 30, y: center.y - 5),
+                                      control2: CGPoint(x: center.x - 20, y: center.y + 5))
+                    context.fill(tailPath, with: .color(.pazuOrange))
 
-                // Shoulders-Up Dynamic App Icon Badge
-                VStack(spacing: 2) {
-                    PazuAppIconView(state: state, iconSize: 72)
+                    // 2. BODY (Rounded Rectangle)
+                    let bodyRect = CGRect(x: center.x - 25, y: center.y - 10, width: 50, height: 55)
+                    let bodyPath = Path(roundedRect: bodyRect, cornerRadius: 20)
+                    context.fill(bodyPath, with: .color(.pazuOrange))
 
-                    Text("Pazu")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.white)
+                    // 3. BELLY (Cream Oval)
+                    let bellyRect = CGRect(x: center.x - 16, y: center.y + 2, width: 32, height: 35)
+                    let bellyPath = Path(ellipseIn: bellyRect)
+                    context.fill(bellyPath, with: .color(.cream))
 
-                    Text(getPazuActionMessage())
-                        .font(.system(size: 9, weight: .medium))
-                        .foregroundColor(.rawBrass)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 8)
+                    // 4. HEAD (Circle)
+                    let headRect = CGRect(x: center.x - 22, y: center.y - 42, width: 44, height: 44)
+                    let headPath = Path(ellipseIn: headRect)
+                    context.fill(headPath, with: .color(.pazuOrange))
+
+                    // 5. EARS
+                    var leftEar = Path()
+                    leftEar.move(to: CGPoint(x: center.x - 18, y: center.y - 35))
+                    leftEar.addLine(to: CGPoint(x: center.x - 26, y: center.y - 52))
+                    leftEar.addLine(to: CGPoint(x: center.x - 8, y: center.y - 40))
+                    context.fill(leftEar, with: .color(.pazuOrange))
+
+                    var rightEar = Path()
+                    rightEar.move(to: CGPoint(x: center.x + 18, y: center.y - 35))
+                    rightEar.addLine(to: CGPoint(x: center.x + 26, y: center.y - 52))
+                    rightEar.addLine(to: CGPoint(x: center.x + 8, y: center.y - 40))
+                    context.fill(rightEar, with: .color(.pazuOrange))
+
+                    // 6. FACE MASK (Cream Muzzle)
+                    let muzzleRect = CGRect(x: center.x - 12, y: center.y - 24, width: 24, height: 18)
+                    context.fill(Path(ellipseIn: muzzleRect), with: .color(.cream))
+
+                    // 7. EYES & EXPRESSIONS (State-driven vector shapes)
+                    if state.currentPazuState == .happy || state.currentPazuState == .proud {
+                        var eyePath = Path()
+                        eyePath.move(to: CGPoint(x: center.x - 12, y: center.y - 28))
+                        eyePath.addQuadCurve(to: CGPoint(x: center.x - 6, y: center.y - 28), control: CGPoint(x: center.x - 9, y: center.y - 32))
+                        eyePath.move(to: CGPoint(x: center.x + 6, y: center.y - 28))
+                        eyePath.addQuadCurve(to: CGPoint(x: center.x + 12, y: center.y - 28), control: CGPoint(x: center.x + 9, y: center.y - 32))
+                        context.stroke(eyePath, with: .color(.inkBlack), lineWidth: 2)
+                    } else if state.currentPazuState == .sleeping {
+                        var eyePath = Path()
+                        eyePath.move(to: CGPoint(x: center.x - 12, y: center.y - 26))
+                        eyePath.addLine(to: CGPoint(x: center.x - 6, y: center.y - 26))
+                        eyePath.move(to: CGPoint(x: center.x + 6, y: center.y - 26))
+                        eyePath.addLine(to: CGPoint(x: center.x + 12, y: center.y - 26))
+                        context.stroke(eyePath, with: .color(.inkBlack), lineWidth: 2)
+                    } else {
+                        let leftEye = CGRect(x: center.x - 11, y: center.y - 30, width: 5, height: 5)
+                        let rightEye = CGRect(x: center.x + 6, y: center.y - 30, width: 5, height: 5)
+                        context.fill(Path(ellipseIn: leftEye), with: .color(.inkBlack))
+                        context.fill(Path(ellipseIn: rightEye), with: .color(.inkBlack))
+                    }
+
+                    // 8. NOSE
+                    let noseRect = CGRect(x: center.x - 3, y: center.y - 19, width: 6, height: 4)
+                    context.fill(Path(ellipseIn: noseRect), with: .color(.inkBlack))
+
+                    // 9. LEGS
+                    let leg1 = Path(ellipseIn: CGRect(x: center.x - 18, y: center.y + 40, width: 12, height: 8))
+                    let leg2 = Path(ellipseIn: CGRect(x: center.x + 6, y: center.y + 40, width: 12, height: 8))
+                    context.fill(leg1, with: .color(.pazuOrange))
+                    context.fill(leg2, with: .color(.pazuOrange))
                 }
+                .frame(width: 160, height: 160)
             }
-            .frame(width: 170, height: 170)
-        }
-        .onAppear {
-            withAnimation(Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
-                bounceOffset = -4.0
-                tailAngle = 36.0
-            }
+
+            Text("Pazu the Red Panda")
+                .font(.custom("Inter", size: 13).weight(.bold))
+                .foregroundColor(.inkBlack)
+
+            Text(getPazuActionText())
+                .font(.custom("Inter", size: 10))
+                .foregroundColor(.terracotta)
+                .multilineTextAlignment(.center)
         }
     }
 
-    private func getPazuActionMessage() -> String {
+    private func getPazuActionText() -> String {
         switch state.currentPazuState {
-        case .idle: return "Pazu is resting peacefully in the garden."
-        case .happy: return "\"I'm happy to see you trying!\""
-        case .proud: return "Proud of your \(state.streak)-day streak!"
-        case .clumsy: return "Tripped over its tail! \"Eep!\" (5% clumsy chance)"
-        case .sleeping: return "Curled up asleep under the tree..."
-        case .curious: return "Curiously exploring the garden..."
-        case .excited: return "Bouncing with excitement!"
-        case .gentleDisappointment: return "Missed you, but ready when you are."
-        case .meditating: return "Meditating peacefully..."
-        case .playing: return "Chasing falling cherry blossom leaves!"
-        case .eating: return "Munching on fresh bamboo!"
-        case .greeting: return "Waving happily at you!"
-        case .watching: return "Observing your mindful session..."
-        }
-    }
-
-    private func getKoiColor() -> Color {
-        switch state.koiColor {
-        case "Orange": return Color.orange
-        case "White": return Color.white
-        case "Black": return Color.black
-        case "Gold": return Color.rawBrass
-        default: return Color.orange
+        case .idle: return "Pazu is resting peacefully in the Zen garden."
+        case .happy: return "Pazu is happy to see your mindfulness!"
+        case .proud: return "Pazu stands proud of your streak!"
+        case .clumsy: return "Pazu tripped over its tail! Keeping trying!"
+        case .sleeping: return "Pazu is sleeping peacefully..."
+        case .curious: return "Pazu is curiously exploring..."
+        case .excited: return "Pazu is bouncing with joy!"
+        case .gentleDisappointment: return "Pazu missed you, but welcomes you back."
+        case .meditating: return "Pazu is meditating..."
+        case .playing: return "Pazu is playing in the leaves."
+        case .eating: return "Pazu is eating bamboo."
+        case .greeting: return "Pazu waves hello!"
+        case .watching: return "Pazu is observing your session."
         }
     }
 }

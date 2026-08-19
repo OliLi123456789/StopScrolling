@@ -1,14 +1,13 @@
 import SwiftUI
 
-// Full-screen user intervention overlays, including Breathing countdown and Intention prompting.
+// Full-screen user intervention overlays with Washi Paper styling and zero emojis
 struct PauseGateView: View {
     let appName: String
     @ObservedObject var state: AppState
     @Binding var activeOverlayApp: String?
 
     @State private var timeRemaining: Int = 10
-    @State private var breathingScale: CGFloat = 0.9
-    @State private var timerActive = false
+    @State private var breathingScale: CGFloat = 0.95
     @State private var showsFeedSimulator = false
     @State private var selectedIntent: String? = nil
 
@@ -26,15 +25,14 @@ struct PauseGateView: View {
                     Spacer()
 
                     VStack(spacing: 8) {
-                        Text("\(appName.uppercased()) TRIGGERED")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(.slate500)
+                        Text("\(appName.uppercased()) PAUSED")
+                            .font(.custom("Inter", size: 11).weight(.bold))
+                            .foregroundColor(.inkMuted)
                             .tracking(2)
 
                         Text("\"What brings you here?\"")
-                            .font(.system(size: 20, weight: .bold, design: .serif))
-                            .italic()
-                            .foregroundColor(.white)
+                            .font(.custom("Inter", size: 22).weight(.bold))
+                            .foregroundColor(.inkBlack)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 24)
                     }
@@ -46,7 +44,6 @@ struct PauseGateView: View {
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                             ForEach(intentChoices, id: \.self) { choice in
                                 Button(action: {
-                                    triggerSelectionHaptic()
                                     if selectedIntent == choice {
                                         selectedIntent = nil
                                     } else {
@@ -54,15 +51,15 @@ struct PauseGateView: View {
                                     }
                                 }) {
                                     Text(choice)
-                                        .font(.system(size: 12, weight: .bold))
-                                        .foregroundColor(selectedIntent == choice ? .rawBrass : .slate300)
+                                        .font(.custom("Inter", size: 12).weight(.bold))
+                                        .foregroundColor(selectedIntent == choice ? .terracotta : .inkBlack)
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 12)
-                                        .background(selectedIntent == choice ? Color.rawBrass.opacity(0.15) : Color.charcoalLight)
+                                        .background(selectedIntent == choice ? Color.terracotta.opacity(0.12) : Color.pureWhite)
                                         .cornerRadius(12)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 12)
-                                                .stroke(selectedIntent == choice ? Color.rawBrass : Color.slate800, lineWidth: 1)
+                                                .stroke(selectedIntent == choice ? Color.terracotta : Color.paperBorder, lineWidth: 1)
                                         )
                                 }
                             }
@@ -75,8 +72,7 @@ struct PauseGateView: View {
                     // Decisive Turbo-Tap Button
                     VStack(spacing: 16) {
                         Button(action: {
-                            triggerHeavyHaptic()
-                            state.tokens += 1 // award 1 token for entry
+                            state.tokens += 1
                             state.logAction(appName: appName, action: "Gate Unlocked (touch)", result: "Intent: \(selectedIntent ?? "None") (+1 Token)")
                             withAnimation {
                                 showsFeedSimulator = true
@@ -84,21 +80,22 @@ struct PauseGateView: View {
                         }) {
                             HStack {
                                 Text("YES, LET ME IN")
-                                Image(systemName: "door.right.hand.open")
+                                Image(systemName: "arrow.right.circle.fill")
                             }
-                            .font(.system(size: 13, weight: .black))
+                            .font(.custom("Inter", size: 14).weight(.bold))
                             .foregroundColor(.white)
                             .tracking(1.5)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
-                            .background(Color.rawBrass)
-                            .cornerRadius(14)
-                            .shadow(color: Color.rawBrass.opacity(0.3), radius: 8, y: 4)
+                            .background(
+                                Capsule()
+                                    .fill(Color.terracotta)
+                                    .shadow(color: Color.terracotta.opacity(0.35), radius: 8, x: 0, y: 4)
+                            )
                         }
 
                         // Hardware Bypass Double-Tap simulation link
                         Button(action: {
-                            triggerSelectionHaptic()
                             state.tokens += 1
                             state.logAction(appName: appName, action: "Gate Unlocked (hardware)", result: "Bypassed via side button (+1 Token)")
                             withAnimation {
@@ -106,8 +103,8 @@ struct PauseGateView: View {
                             }
                         }) {
                             Text("skip this gate by double-tapping side button")
-                                .font(.system(size: 10, weight: .medium))
-                                .foregroundColor(.slate500)
+                                .font(.custom("Inter", size: 10).weight(.medium))
+                                .foregroundColor(.inkMuted)
                                 .underline()
                         }
                     }
@@ -116,31 +113,10 @@ struct PauseGateView: View {
                 .padding(.vertical, 24)
             }
         }
-        .onAppear {
-            timeRemaining = state.pauseDuration
-            timerActive = true
-            startBreathingAnimation()
-        }
-    }
-
-    private func startBreathingAnimation() {
-        withAnimation(Animation.easeInOut(duration: 4.0).repeatForever(autoreverses: true)) {
-            breathingScale = 1.15
-        }
-    }
-
-    private func triggerSelectionHaptic() {
-        let generator = UISelectionFeedbackGenerator()
-        generator.selectionChanged()
-    }
-
-    private func triggerHeavyHaptic() {
-        let generator = UIImpactFeedbackGenerator(style: .heavy)
-        generator.impactOccurred()
     }
 }
 
-// Optional pre-pause intention checklist view
+// Optional pre-pause intention prompt view
 struct IntentionPromptView: View {
     let appName: String
     let onSubmit: (String) -> Void
@@ -154,17 +130,17 @@ struct IntentionPromptView: View {
                 VStack(spacing: 24) {
                     VStack(spacing: 8) {
                         Text("INTENTION PROMPT")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.rawBrass)
+                            .font(.custom("Inter", size: 10).weight(.bold))
+                            .foregroundColor(.terracotta)
                             .tracking(1.5)
 
                         Text("What are you here for?")
-                            .font(.system(size: 24, weight: .black))
-                            .foregroundColor(.white)
+                            .font(.custom("Inter", size: 24).weight(.black))
+                            .foregroundColor(.inkBlack)
 
                         Text("Acknowledge your goal for opening \(appName) to reduce mindless scroll habits.")
-                            .font(.system(size: 13))
-                            .foregroundColor(.slate400)
+                            .font(.custom("Inter", size: 13))
+                            .foregroundColor(.inkMuted)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 16)
                     }
@@ -176,19 +152,19 @@ struct IntentionPromptView: View {
                             }) {
                                 HStack {
                                     Text(choice)
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundColor(.white)
+                                        .font(.custom("Inter", size: 14).weight(.semibold))
+                                        .foregroundColor(.inkBlack)
                                     Spacer()
                                     Image(systemName: "chevron.right")
                                         .font(.system(size: 11))
-                                        .foregroundColor(.slate600)
+                                        .foregroundColor(.inkMuted)
                                 }
                                 .padding()
-                                .background(Color.charcoalLight)
+                                .background(Color.pureWhite)
                                 .cornerRadius(14)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 14)
-                                        .stroke(Color.slate800, lineWidth: 1)
+                                        .stroke(Color.paperBorder, lineWidth: 1)
                                 )
                             }
                         }
@@ -196,15 +172,15 @@ struct IntentionPromptView: View {
 
                     Spacer()
                     Text("Stored locally in your privacy-first Scrollytics trend logs.")
-                        .font(.system(size: 11))
-                        .foregroundColor(.slate500)
+                        .font(.custom("Inter", size: 11))
+                        .foregroundColor(.inkMuted)
                 }
                 .padding(24)
             )
     }
 }
 
-// After Scroll reflection card questionnaire with Ghost Check-In
+// After Scroll reflection card questionnaire with Ghost Check-In & Symbol Ratings
 struct CheckInView: View {
     @ObservedObject var state: AppState
     @Binding var activeOverlayApp: String?
@@ -223,97 +199,114 @@ struct CheckInView: View {
                     VStack(spacing: 12) {
                         ZStack {
                             Circle()
-                                .fill(Color.rawBrass.opacity(0.1))
+                                .fill(Color.terracotta.opacity(0.1))
                                 .frame(width: 60, height: 60)
-                            Image(systemName: "smile")
+                            Image(systemName: "hand.tap.fill")
                                 .font(.system(size: 24))
-                                .foregroundColor(.rawBrass)
+                                .foregroundColor(.terracotta)
                         }
 
                         Text("After-Scroll Reflection")
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundColor(.white)
+                            .font(.custom("Inter", size: 22).weight(.bold))
+                            .foregroundColor(.inkBlack)
 
-                        Text("Breathe. Take a moment to reflect on your 15-minute scrolling session.")
-                            .font(.system(size: 13))
-                            .foregroundColor(.slate400)
+                        Text("Take a moment to reflect on your 15-minute scrolling session.")
+                            .font(.custom("Inter", size: 13))
+                            .foregroundColor(.inkMuted)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 24)
 
                         if isAutoTriggered {
                             HStack(spacing: 6) {
-                                Image(systemName: "bell.ring")
+                                Image(systemName: "bell.badge.fill")
                                     .font(.system(size: 11))
-                                Text("GHOST CHECK-IN ACTIVE: \(12 - ghostSeconds)S LEFT")
-                                    .font(.system(size: 10, weight: .bold))
+                                Text("GHOST CHECK-IN: \(12 - ghostSeconds)S LEFT")
+                                    .font(.custom("Inter", size: 10).weight(.bold))
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
-                            .foregroundColor(.rose)
-                            .background(Color.rose.opacity(0.1))
+                            .foregroundColor(.terracotta)
+                            .background(Color.terracotta.opacity(0.1))
                             .cornerRadius(20)
                             .padding(.top, 4)
                         }
                     }
 
+                    // Symbol-based Rating Buttons: [Circle (Positive)], [Dash (Neutral)], [Cross (Negative)]
                     VStack(spacing: 16) {
                         Text("\"Was that time well spent?\"")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.slate200)
+                            .font(.custom("Inter", size: 15).weight(.semibold))
+                            .foregroundColor(.inkBlack)
 
                         HStack(spacing: 12) {
-                            Button(action: { submitReflection("Yes, I got what I needed") }) {
+                            Button(action: { submitReflection("Positive") }) {
                                 VStack(spacing: 8) {
-                                    Text("😊")
-                                        .font(.system(size: 28))
-                                    Text("Yes")
-                                        .font(.system(size: 11, weight: .semibold))
-                                        .foregroundColor(.slate300)
+                                    Image(systemName: "circle")
+                                        .font(.system(size: 24, weight: .bold))
+                                        .foregroundColor(.sageGreen)
+                                    Text("Positive")
+                                        .font(.custom("Inter", size: 11).weight(.semibold))
+                                        .foregroundColor(.inkBlack)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
-                                .background(Color.charcoalLight)
+                                .background(Color.pureWhite)
                                 .cornerRadius(12)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.sageGreen.opacity(0.4), lineWidth: 1)
+                                )
                             }
 
-                            Button(action: { submitReflection("Not sure") }) {
+                            Button(action: { submitReflection("Neutral") }) {
                                 VStack(spacing: 8) {
-                                    Text("😐")
-                                        .font(.system(size: 28))
-                                    Text("Not Sure")
-                                        .font(.system(size: 11, weight: .semibold))
-                                        .foregroundColor(.slate300)
+                                    Image(systemName: "minus")
+                                        .font(.system(size: 24, weight: .bold))
+                                        .foregroundColor(.inkMuted)
+                                    Text("Neutral")
+                                        .font(.custom("Inter", size: 11).weight(.semibold))
+                                        .foregroundColor(.inkBlack)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
-                                .background(Color.charcoalLight)
+                                .background(Color.pureWhite)
                                 .cornerRadius(12)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.paperBorder, lineWidth: 1)
+                                )
                             }
 
-                            Button(action: { submitReflection("No, I got lost") }) {
+                            Button(action: { submitReflection("Negative") }) {
                                 VStack(spacing: 8) {
-                                    Text("😞")
-                                        .font(.system(size: 28))
-                                    Text("No, Lost")
-                                        .font(.system(size: 11, weight: .semibold))
-                                        .foregroundColor(.slate300)
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 24, weight: .bold))
+                                        .foregroundColor(.terracotta)
+                                    Text("Negative")
+                                        .font(.custom("Inter", size: 11).weight(.semibold))
+                                        .foregroundColor(.inkBlack)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
-                                .background(Color.charcoalLight)
+                                .background(Color.pureWhite)
                                 .cornerRadius(12)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.terracotta.opacity(0.4), lineWidth: 1)
+                                )
                             }
                         }
                     }
                     .padding(20)
-                    .background(Color.charcoalLight.opacity(0.4))
+                    .background(Color.pureWhite)
                     .cornerRadius(16)
+                    .shadow(color: Color.paperShadow.opacity(0.5), radius: 8, x: 0, y: 4)
 
                     Spacer()
 
                     Text("Reflection is stored anonymously in your Scrollytics Dashboard database.")
-                        .font(.system(size: 11))
-                        .foregroundColor(.slate500)
+                        .font(.custom("Inter", size: 11))
+                        .foregroundColor(.inkMuted)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 16)
                 }
@@ -326,9 +319,9 @@ struct CheckInView: View {
                     timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
                         ghostSeconds += 1
 
-                        if ghostSeconds == 3 {
+                        if ghostSeconds == 9 { // 3 seconds remaining
                             triggerDoubleHapticWarning()
-                            state.logAction(appName: "Ghost Warning", action: "3 seconds elapsed", result: "Double haptic triggered")
+                            state.logAction(appName: "Ghost Warning", action: "3s remaining", result: "Double haptic triggered")
                         }
 
                         if ghostSeconds >= 12 {
@@ -354,7 +347,7 @@ struct CheckInView: View {
     private func autoLogGhostNeutral() {
         state.checkedInCount += 1
         state.tokens += 1
-        state.logAction(appName: "Ghost Auto-Logged", action: "12s elapsed", result: "Auto-logged Neutral 😐")
+        state.logAction(appName: "Ghost Auto-Logged", action: "12s elapsed", result: "Auto-logged Neutral [Dash]")
         state.dailyScrollMinutes += 15
         activeOverlayApp = nil
     }
@@ -362,8 +355,8 @@ struct CheckInView: View {
     private func submitReflection(_ rating: String) {
         timer?.invalidate()
         state.checkedInCount += 1
-        state.tokens += 3 // award 3 tokens for rating session
-        state.logAction(appName: "Reflection Log", action: "After-scroll reflection check-in", result: "\(rating) (+3 Tokens)")
+        state.tokens += 3
+        state.logAction(appName: "Reflection Log", action: "After-scroll reflection check-in", result: "Rated: \(rating) (+3 Tokens)")
         state.dailyScrollMinutes += 15
         activeOverlayApp = nil
     }
@@ -388,11 +381,11 @@ struct MockFeedView: View {
                 HStack {
                     HStack(spacing: 6) {
                         Circle()
-                            .fill(Color.rawBrass)
+                            .fill(Color.terracotta)
                             .frame(width: 6, height: 6)
-                        Text("\(appName.uppercased()) SIM")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(.white)
+                        Text("\(appName.uppercased()) FEED")
+                            .font(.custom("Inter", size: 11).weight(.bold))
+                            .foregroundColor(.inkBlack)
                     }
                     Spacer()
                     HStack {
@@ -403,11 +396,11 @@ struct MockFeedView: View {
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
-                    .background(Color.charcoalLight)
+                    .background(Color.pureWhite)
                     .cornerRadius(20)
                 }
                 .padding()
-                .background(Color.charcoal)
+                .background(Color.washiPaper)
 
                 // Infinite post simulator placeholder
                 ScrollView {
@@ -415,104 +408,90 @@ struct MockFeedView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             HStack {
                                 Circle()
-                                    .fill(Color.slate800)
+                                    .fill(Color.paperBorder)
                                     .frame(width: 24, height: 24)
                                 Text("@doomscroller_anon")
-                                    .font(.system(size: 11, weight: .bold))
-                                    .foregroundColor(.white)
+                                    .font(.custom("Inter", size: 11).weight(.bold))
+                                    .foregroundColor(.inkBlack)
                                 Spacer()
                             }
-                            Text("Just scrolling... nothing real here. Just wasting seconds. But wait, Pause is keeping time of my session in the background!")
-                                .font(.system(size: 12))
-                                .foregroundColor(.slate300)
+                            Text("Just scrolling... nothing real here. Pause is keeping time of my session in the background.")
+                                .font(.custom("Inter", size: 12))
+                                .foregroundColor(.inkBlack)
                                 .lineSpacing(3)
                         }
                         .padding()
-                        .background(Color.charcoalLight)
+                        .background(Color.pureWhite)
                         .cornerRadius(12)
 
-                        // Interactive Dynamic Island alert overlay representation
+                        // Live Activity Alert Card
                         VStack(spacing: 12) {
                             HStack {
                                 HStack(spacing: 6) {
                                     Circle()
-                                        .fill(Color.desaturatedGreen)
+                                        .fill(Color.sageGreen)
                                         .frame(width: 8, height: 8)
-                                    Text("15/15 MIN LIMIT")
-                                        .font(.system(size: 10, weight: .bold))
-                                        .foregroundColor(.desaturatedGreen)
+                                    Text("15 MIN LIMIT")
+                                        .font(.custom("Inter", size: 10).weight(.bold))
+                                        .foregroundColor(.sageGreen)
                                 }
                                 Spacer()
-                                Text("Dynamic Island Alert")
-                                    .font(.system(size: 10, weight: .bold))
-                                    .foregroundColor(.white)
+                                Text("Live Activity")
+                                    .font(.custom("Inter", size: 10).weight(.bold))
+                                    .foregroundColor(.inkBlack)
                             }
 
                             Text("\"Time's up. Was it worth it?\"")
-                                .font(.system(size: 13, weight: .bold))
-                                .foregroundColor(.white)
-                                .italic()
+                                .font(.custom("Inter", size: 13).weight(.bold))
+                                .foregroundColor(.inkBlack)
 
                             HStack(spacing: 8) {
-                                Button(action: { triggerQuickCheckIn("Yes, I got what I needed") }) {
-                                    Text("😊 Yes")
-                                        .font(.system(size: 11, weight: .semibold))
-                                        .foregroundColor(.white)
-                                        .padding(.vertical, 8)
-                                        .frame(maxWidth: .infinity)
-                                        .background(Color.charcoalLight)
-                                        .cornerRadius(8)
+                                Button(action: { triggerQuickCheckIn("Positive") }) {
+                                    HStack {
+                                        Image(systemName: "circle")
+                                        Text("Positive")
+                                    }
+                                    .font(.custom("Inter", size: 11).weight(.semibold))
+                                    .foregroundColor(.sageGreen)
+                                    .padding(.vertical, 8)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color.washiPaper)
+                                    .cornerRadius(8)
                                 }
-                                Button(action: { triggerQuickCheckIn("Not sure") }) {
-                                    Text("😐 Neutral")
-                                        .font(.system(size: 11, weight: .semibold))
-                                        .foregroundColor(.white)
-                                        .padding(.vertical, 8)
-                                        .frame(maxWidth: .infinity)
-                                        .background(Color.charcoalLight)
-                                        .cornerRadius(8)
+                                Button(action: { triggerQuickCheckIn("Neutral") }) {
+                                    HStack {
+                                        Image(systemName: "minus")
+                                        Text("Neutral")
+                                    }
+                                    .font(.custom("Inter", size: 11).weight(.semibold))
+                                    .foregroundColor(.inkMuted)
+                                    .padding(.vertical, 8)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color.washiPaper)
+                                    .cornerRadius(8)
                                 }
-                                Button(action: { triggerQuickCheckIn("No, I got lost") }) {
-                                    Text("😞 No")
-                                        .font(.system(size: 11, weight: .semibold))
-                                        .foregroundColor(.white)
-                                        .padding(.vertical, 8)
-                                        .frame(maxWidth: .infinity)
-                                        .background(Color.charcoalLight)
-                                        .cornerRadius(8)
+                                Button(action: { triggerQuickCheckIn("Negative") }) {
+                                    HStack {
+                                        Image(systemName: "xmark")
+                                        Text("Negative")
+                                    }
+                                    .font(.custom("Inter", size: 11).weight(.semibold))
+                                    .foregroundColor(.terracotta)
+                                    .padding(.vertical, 8)
+                                    .frame(maxWidth: .infinity)
+                                    .background(Color.washiPaper)
+                                    .cornerRadius(8)
                                 }
                             }
                         }
                         .padding()
-                        .background(Color.black)
+                        .background(Color.pureWhite)
                         .cornerRadius(16)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.desaturatedGreen.opacity(0.3), lineWidth: 1)
-                        )
-
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack {
-                                Circle()
-                                        .fill(Color.slate800)
-                                        .frame(width: 24, height: 24)
-                                Text("@viral_feed_trend")
-                                    .font(.system(size: 11, weight: .bold))
-                                    .foregroundColor(.white)
-                                Spacer()
-                            }
-                            Text("This is simulated infinite scrolling inside the sandbox environment.")
-                                .font(.system(size: 12))
-                                .foregroundColor(.slate300)
-                                .lineSpacing(3)
-                        }
-                        .padding()
-                        .background(Color.charcoalLight)
-                        .cornerRadius(12)
+                        .shadow(color: Color.paperShadow, radius: 6, x: 0, y: 3)
                     }
                     .padding()
                 }
-                .background(Color.charcoal)
+                .background(Color.washiPaper)
 
                 // Bottom exit bar
                 Button(action: {
@@ -522,19 +501,18 @@ struct MockFeedView: View {
                     }
                 }) {
                     HStack {
-                        Image(systemName: "log.out")
+                        Image(systemName: "arrow.right.circle")
                         Text("Stop Scrolling (Exit Feed)")
                     }
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.custom("Inter", size: 13).weight(.bold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
-                    .background(Color.rose.opacity(0.85))
+                    .background(Color.terracotta)
                 }
             }
             .onAppear {
                 Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-                    // Speed up simulation to tick down 150 seconds per second
                     if timeRemaining > 0 {
                         timeRemaining -= 150
                     } else {
@@ -552,7 +530,7 @@ struct MockFeedView: View {
     private func triggerQuickCheckIn(_ rating: String) {
         state.checkedInCount += 1
         state.tokens += 3
-        state.logAction(appName: "Reflection Log", action: "Island reflection check-in", result: "\(rating) (+3 Tokens)")
+        state.logAction(appName: "Reflection Log", action: "Island reflection check-in", result: "Rated: \(rating) (+3 Tokens)")
         state.dailyScrollMinutes += 15
         activeOverlayApp = nil
     }

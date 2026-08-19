@@ -1,6 +1,6 @@
 import SwiftUI
 
-// Step-by-step onboarding screen matching design specifications.
+// Step-by-step onboarding screen matching Washi Paper Minimalism specifications
 struct OnboardingView: View {
     @ObservedObject var state: AppState
     @State private var step = 1
@@ -17,7 +17,7 @@ struct OnboardingView: View {
                     HStack(spacing: 8) {
                         ForEach(1...3, id: \.self) { idx in
                             Capsule()
-                                .fill(idx <= step ? Color.rawBrass : Color.slate800)
+                                .fill(idx <= step ? Color.terracotta : Color.paperBorder)
                                 .frame(height: 4)
                         }
                     }
@@ -30,39 +30,38 @@ struct OnboardingView: View {
                         VStack(spacing: 28) {
                             ZStack {
                                 Circle()
-                                    .fill(Color.rawBrass.opacity(0.1))
+                                    .fill(Color.terracotta.opacity(0.1))
                                     .frame(width: 100, height: 100)
                                 Image(systemName: "compass")
                                     .font(.system(size: 40))
-                                    .foregroundColor(.rawBrass)
+                                    .foregroundColor(.terracotta)
                             }
 
                             VStack(spacing: 12) {
                                 Text("You don't have to quit.\nYou just have to pause.")
-                                    .font(.system(size: 28, weight: .black, design: .sans))
+                                    .font(.custom("Inter", size: 28).weight(.black))
                                     .multilineTextAlignment(.center)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(.inkBlack)
                                     .lineSpacing(4)
 
-                                Text("We are not a traditional digital block list. We are a supportive companion that helps restore the intentional space between your reflexes and actions.")
-                                    .font(.system(size: 14, weight: .regular))
+                                Text("Meet Pazu the Red Panda. Pause is a gentle companion that restores the intentional space between your reflexes and actions.")
+                                    .font(.custom("Inter", size: 14))
                                     .multilineTextAlignment(.center)
-                                    .foregroundColor(.slate400)
+                                    .foregroundColor(.inkMuted)
                                     .padding(.horizontal, 24)
                                     .lineSpacing(5)
                             }
                         }
-                        .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
                     } else if step == 2 {
                         // Select managed apps
                         VStack(spacing: 16) {
                             VStack(spacing: 6) {
                                 Text("Managed Social Networks")
-                                    .font(.system(size: 22, weight: .bold))
-                                    .foregroundColor(.white)
+                                    .font(.custom("Inter", size: 22).weight(.bold))
+                                    .foregroundColor(.inkBlack)
                                 Text("Choose apps you want to pause before scrolling.")
-                                    .font(.system(size: 13))
-                                    .foregroundColor(.slate400)
+                                    .font(.custom("Inter", size: 13))
+                                    .foregroundColor(.inkMuted)
                             }
 
                             ScrollView {
@@ -77,18 +76,18 @@ struct OnboardingView: View {
                                         }) {
                                             HStack {
                                                 Text(app)
-                                                    .font(.system(size: 14, weight: .semibold))
-                                                    .foregroundColor(.white)
+                                                    .font(.custom("Inter", size: 14).weight(.semibold))
+                                                    .foregroundColor(.inkBlack)
                                                 Spacer()
                                                 Image(systemName: state.managedApps.contains(app) ? "checkmark.circle.fill" : "circle")
-                                                    .foregroundColor(state.managedApps.contains(app) ? .rawBrass : .slate600)
+                                                    .foregroundColor(state.managedApps.contains(app) ? .terracotta : .inkMuted)
                                             }
                                             .padding()
-                                            .background(state.managedApps.contains(app) ? Color.rawBrass.opacity(0.1) : Color.charcoalLight)
+                                            .background(Color.pureWhite)
                                             .cornerRadius(12)
                                             .overlay(
                                                 RoundedRectangle(cornerRadius: 12)
-                                                    .stroke(state.managedApps.contains(app) ? Color.rawBrass.opacity(0.4) : Color.slate800, lineWidth: 1)
+                                                    .stroke(state.managedApps.contains(app) ? Color.terracotta : Color.paperBorder, lineWidth: 1)
                                             )
                                         }
                                     }
@@ -96,26 +95,25 @@ struct OnboardingView: View {
                                 .padding(.top, 10)
                             }
                         }
-                        .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
                     } else if step == 3 {
                         // Set pause duration
                         VStack(spacing: 24) {
                             ZStack {
                                 Circle()
-                                    .fill(Color.rawBrass.opacity(0.1))
+                                    .fill(Color.terracotta.opacity(0.1))
                                     .frame(width: 80, height: 80)
                                 Image(systemName: "timer")
                                     .font(.system(size: 32))
-                                    .foregroundColor(.rawBrass)
+                                    .foregroundColor(.terracotta)
                             }
 
                             VStack(spacing: 8) {
                                 Text("Set your Pause duration")
-                                    .font(.system(size: 22, weight: .bold))
-                                    .foregroundColor(.white)
+                                    .font(.custom("Inter", size: 22).weight(.bold))
+                                    .foregroundColor(.inkBlack)
                                 Text("How many seconds do you need to breathe before access is granted?")
-                                    .font(.system(size: 13))
-                                    .foregroundColor(.slate400)
+                                    .font(.custom("Inter", size: 13))
+                                    .foregroundColor(.inkMuted)
                                     .multilineTextAlignment(.center)
                                     .padding(.horizontal, 16)
                             }
@@ -127,26 +125,21 @@ struct OnboardingView: View {
                                         state.pauseDuration = sec
                                     }) {
                                         Text("\(sec) Seconds")
-                                            .font(.system(size: 14, weight: .bold))
-                                            .foregroundColor(tempPauseDuration == sec ? .rawBrass : .slate300)
+                                            .font(.custom("Inter", size: 14).weight(.bold))
+                                            .foregroundColor(tempPauseDuration == sec ? .terracotta : .inkBlack)
                                             .frame(maxWidth: .infinity)
                                             .padding(.vertical, 14)
-                                            .background(tempPauseDuration == sec ? Color.rawBrass.opacity(0.15) : Color.charcoalLight)
+                                            .background(tempPauseDuration == sec ? Color.terracotta.opacity(0.15) : Color.pureWhite)
                                             .cornerRadius(12)
                                             .overlay(
                                                 RoundedRectangle(cornerRadius: 12)
-                                                    .stroke(tempPauseDuration == sec ? Color.rawBrass : Color.slate800, lineWidth: 1)
+                                                    .stroke(tempPauseDuration == sec ? Color.terracotta : Color.paperBorder, lineWidth: 1)
                                             )
                                     }
                                 }
                             }
                             .padding(.horizontal, 24)
-
-                            Text("Recommended minimum pause: 10 seconds")
-                                .font(.system(size: 11))
-                                .foregroundColor(.slate500)
                         }
-                        .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
                     }
 
                     Spacer()
@@ -158,21 +151,23 @@ struct OnboardingView: View {
                                 step += 1
                             } else {
                                 state.isOnboarded = true
-                                state.logAction(appName: "Pause App", action: "Completed Welcome Onboarding", result: "Active")
+                                state.logAction(appName: "Pause App", action: "Started Journey", result: "Active")
                             }
                         }
                     }) {
                         HStack {
-                            Text(step == 3 ? "Ready to Try" : "Continue")
-                            Image(systemName: step == 3 ? "checkmark" : "arrow.right")
+                            Text(step == 3 ? "Start My Journey" : "Continue")
+                            Image(systemName: step == 3 ? "sparkles" : "arrow.right")
                         }
-                        .font(.system(size: 15, weight: .bold))
+                        .font(.custom("Inter", size: 16).weight(.bold))
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
-                        .background(LinearGradient(gradient: Gradient(colors: [Color.rawBrass, Color.rawBrass.opacity(0.8)]), startPoint: .leading, endPoint: .trailing))
-                        .cornerRadius(14)
-                        .shadow(color: Color.rawBrass.opacity(0.3), radius: 10, y: 5)
+                        .background(
+                            Capsule()
+                                .fill(Color.terracotta)
+                                .shadow(color: Color.terracotta.opacity(0.3), radius: 8, x: 0, y: 4)
+                        )
                     }
                 }
                 .padding(24)

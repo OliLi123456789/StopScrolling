@@ -1,88 +1,74 @@
 import SwiftUI
 
-// PazuAppIconView displays a Shoulders-Up portrait of Pazu the Red Panda with equipped cosmetics and Pazu's active facial expression.
+// PazuAppIconView displays a Shoulders-Up procedural Canvas portrait of Pazu the Red Panda with equipped cosmetics and zero emojis
 struct PazuAppIconView: View {
     @ObservedObject var state: AppState
     var iconSize: CGFloat = 60
 
     var body: some View {
         ZStack {
-            // App Icon Squircle Background with Raw Brass / Charcoal gradient
+            // App Icon Squircle Background with Washi Paper / Terracotta border
             RoundedRectangle(cornerRadius: iconSize * 0.22, style: .continuous)
                 .fill(
                     LinearGradient(
-                        gradient: Gradient(colors: [Color.charcoalLight, Color.charcoal]),
+                        gradient: Gradient(colors: [Color.pureWhite, Color.washiPaper]),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: iconSize * 0.22, style: .continuous)
-                        .stroke(Color.rawBrass.opacity(0.4), lineWidth: 1.5)
+                        .stroke(Color.paperBorder, lineWidth: 1.5)
                 )
 
-            // Shoulders-Up Pazu Portrait with Active Expression & Cosmetics
-            VStack(spacing: -4) {
-                ZStack {
-                    // Hat Cosmetic Overlay
-                    if state.pazuHat == "Leaf Crown" {
-                        Text("👑🍃")
-                            .font(.system(size: iconSize * 0.3))
-                            .offset(y: -iconSize * 0.35)
-                    } else if state.pazuHat == "Straw Hat" {
-                        Text("👒")
-                            .font(.system(size: iconSize * 0.38))
-                            .offset(y: -iconSize * 0.35)
-                    } else if state.pazuHat == "Wizard Hat" {
-                        Text("🧙")
-                            .font(.system(size: iconSize * 0.38))
-                            .offset(y: -iconSize * 0.35)
-                    }
+            // Shoulders-Up Procedural Pazu Canvas
+            Canvas { context, size in
+                let center = CGPoint(x: size.width / 2, y: size.height / 2 + 6)
 
-                    // Glasses Cosmetic Overlay
-                    if state.pazuGlasses == "Round Glasses" {
-                        Text("👓")
-                            .font(.system(size: iconSize * 0.28))
-                            .offset(y: -iconSize * 0.1)
-                    } else if state.pazuGlasses == "Sunglasses" {
-                        Text("🕶️")
-                            .font(.system(size: iconSize * 0.28))
-                            .offset(y: -iconSize * 0.1)
-                    }
+                // Head
+                let headRect = CGRect(x: center.x - 22, y: center.y - 22, width: 44, height: 44)
+                context.fill(Path(ellipseIn: headRect), with: .color(.pazuOrange))
 
-                    // Pazu Head & Shoulders Base with Active Expression
-                    Text(getPazuExpressionEmoji())
-                        .font(.system(size: iconSize * 0.52))
+                // Ears
+                var leftEar = Path()
+                leftEar.move(to: CGPoint(x: center.x - 18, y: center.y - 15))
+                leftEar.addLine(to: CGPoint(x: center.x - 25, y: center.y - 32))
+                leftEar.addLine(to: CGPoint(x: center.x - 8, y: center.y - 20))
+                context.fill(leftEar, with: .color(.pazuOrange))
 
-                    // Scarf Cosmetic Overlay
-                    if state.pazuScarf == "Red Scarf" {
-                        Text("🧣")
-                            .font(.system(size: iconSize * 0.3))
-                            .offset(y: iconSize * 0.22)
-                    }
+                var rightEar = Path()
+                rightEar.move(to: CGPoint(x: center.x + 18, y: center.y - 15))
+                rightEar.addLine(to: CGPoint(x: center.x + 25, y: center.y - 32))
+                rightEar.addLine(to: CGPoint(x: center.x + 8, y: center.y - 20))
+                context.fill(rightEar, with: .color(.pazuOrange))
+
+                // White Muzzle / Cheek Mask
+                let muzzleRect = CGRect(x: center.x - 12, y: center.y - 4, width: 24, height: 18)
+                context.fill(Path(ellipseIn: muzzleRect), with: .color(.cream))
+
+                // Eyes (Vector expression based on state)
+                if state.currentPazuState == .happy || state.currentPazuState == .proud {
+                    // Closed happy eye curves
+                    var eyePath = Path()
+                    eyePath.move(to: CGPoint(x: center.x - 12, y: center.y - 8))
+                    eyePath.addQuadCurve(to: CGPoint(x: center.x - 6, y: center.y - 8), control: CGPoint(x: center.x - 9, y: center.y - 12))
+                    eyePath.move(to: CGPoint(x: center.x + 6, y: center.y - 8))
+                    eyePath.addQuadCurve(to: CGPoint(x: center.x + 12, y: center.y - 8), control: CGPoint(x: center.x + 9, y: center.y - 12))
+                    context.stroke(eyePath, with: .color(.inkBlack), lineWidth: 2)
+                } else {
+                    // Open ink black eyes
+                    let leftEye = CGRect(x: center.x - 11, y: center.y - 10, width: 5, height: 5)
+                    let rightEye = CGRect(x: center.x + 6, y: center.y - 10, width: 5, height: 5)
+                    context.fill(Path(ellipseIn: leftEye), with: .color(.inkBlack))
+                    context.fill(Path(ellipseIn: rightEye), with: .color(.inkBlack))
                 }
+
+                // Nose
+                let noseRect = CGRect(x: center.x - 3, y: center.y + 1, width: 6, height: 4)
+                context.fill(Path(ellipseIn: noseRect), with: .color(.inkBlack))
             }
         }
         .frame(width: iconSize, height: iconSize)
-        .shadow(color: Color.black.opacity(0.3), radius: 4, x: 0, y: 2)
-    }
-
-    // Dynamic expression mapping for Shoulders-Up App Icon
-    private func getPazuExpressionEmoji() -> String {
-        switch state.currentPazuState {
-        case .idle: return "😊🐾"
-        case .happy: return "😁🐾"
-        case .proud: return "😏🐾"
-        case .clumsy: return "😵🐾"
-        case .sleeping: return "😴🐾"
-        case .curious: return "🧐🐾"
-        case .excited: return "🤩🐾"
-        case .gentleDisappointment: return "🥺🐾"
-        case .meditating: return "🧘🐾"
-        case .playing: return "😄🐾"
-        case .eating: return "😋🐾"
-        case .greeting: return "👋🐾"
-        case .watching: return "👀🐾"
-        }
+        .shadow(color: Color.paperShadow.opacity(0.6), radius: 4, x: 0, y: 2)
     }
 }
