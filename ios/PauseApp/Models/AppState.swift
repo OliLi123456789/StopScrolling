@@ -18,6 +18,23 @@ struct ScrollSession: Identifiable, Codable {
     var isActive: Bool
 }
 
+// Pazu the Red Panda Animation / Behavioral States
+enum PazuState: String, Codable, CaseIterable {
+    case idle = "Idle"
+    case happy = "Happy"
+    case proud = "Proud"
+    case clumsy = "Clumsy"
+    case sleeping = "Sleeping"
+    case curious = "Curious"
+    case excited = "Excited"
+    case gentleDisappointment = "Gentle Disappointment"
+    case meditating = "Meditating"
+    case playing = "Playing"
+    case eating = "Eating"
+    case greeting = "Greeting"
+    case watching = "Watching"
+}
+
 // Global AppState manager, implementing Privacy-First locally stored UserDefaults data.
 class AppState: ObservableObject {
     @Published var isOnboarded: Bool {
@@ -100,6 +117,55 @@ class AppState: ObservableObject {
         didSet { UserDefaults.standard.set(checkedInCount, forKey: "checkedInCount") }
     }
 
+    // Pazu Red Panda State
+    @Published var currentPazuState: PazuState {
+        didSet { UserDefaults.standard.set(currentPazuState.rawValue, forKey: "currentPazuState") }
+    }
+
+    @Published var pazuHat: String {
+        didSet { UserDefaults.standard.set(pazuHat, forKey: "pazuHat") }
+    }
+
+    @Published var pazuGlasses: String {
+        didSet { UserDefaults.standard.set(pazuGlasses, forKey: "pazuGlasses") }
+    }
+
+    @Published var pazuScarf: String {
+        didSet { UserDefaults.standard.set(pazuScarf, forKey: "pazuScarf") }
+    }
+
+    @Published var pazuOutfit: String {
+        didSet { UserDefaults.standard.set(pazuOutfit, forKey: "pazuOutfit") }
+    }
+
+    @Published var pazuAccessory: String {
+        didSet { UserDefaults.standard.set(pazuAccessory, forKey: "pazuAccessory") }
+    }
+
+    @Published var unlockedPazuItems: [String] {
+        didSet { UserDefaults.standard.set(unlockedPazuItems, forKey: "unlockedPazuItems") }
+    }
+
+    @Published var gardenTree: String {
+        didSet { UserDefaults.standard.set(gardenTree, forKey: "gardenTree") }
+    }
+
+    @Published var gardenPond: String {
+        didSet { UserDefaults.standard.set(gardenPond, forKey: "gardenPond") }
+    }
+
+    @Published var gardenStructure: String {
+        didSet { UserDefaults.standard.set(gardenStructure, forKey: "gardenStructure") }
+    }
+
+    @Published var gardenAmbient: String {
+        didSet { UserDefaults.standard.set(gardenAmbient, forKey: "gardenAmbient") }
+    }
+
+    @Published var unlockedGardenDecorations: [String] {
+        didSet { UserDefaults.standard.set(unlockedGardenDecorations, forKey: "unlockedGardenDecorations") }
+    }
+
     @Published var scrollSessions: [ScrollSession] {
         didSet {
             if let encoded = try? JSONEncoder().encode(scrollSessions) {
@@ -132,7 +198,6 @@ class AppState: ObservableObject {
         self.quietHoursStart = UserDefaults.standard.string(forKey: "quietHoursStart") ?? "09:00"
         self.quietHoursEnd = UserDefaults.standard.string(forKey: "quietHoursEnd") ?? "17:00"
 
-        // Overhaul Garden state defaults
         self.tokens = UserDefaults.standard.object(forKey: "tokens") == nil ? 15 : UserDefaults.standard.integer(forKey: "tokens")
         self.selectedBonsaiSeason = UserDefaults.standard.string(forKey: "selectedBonsaiSeason") ?? "Spring"
         self.unlockedSeasons = UserDefaults.standard.stringArray(forKey: "unlockedSeasons") ?? ["Spring"]
@@ -140,6 +205,22 @@ class AppState: ObservableObject {
         self.unlockedKoiColors = UserDefaults.standard.stringArray(forKey: "unlockedKoiColors") ?? ["Orange"]
         self.simulatedDaysElapsed = UserDefaults.standard.object(forKey: "simulatedDaysElapsed") == nil ? 1 : UserDefaults.standard.integer(forKey: "simulatedDaysElapsed")
         self.checkedInCount = UserDefaults.standard.object(forKey: "checkedInCount") == nil ? 4 : UserDefaults.standard.integer(forKey: "checkedInCount")
+
+        // Pazu & Garden State Initialization
+        let pazuRaw = UserDefaults.standard.string(forKey: "currentPazuState") ?? "Idle"
+        self.currentPazuState = PazuState(rawValue: pazuRaw) ?? .idle
+        self.pazuHat = UserDefaults.standard.string(forKey: "pazuHat") ?? "None"
+        self.pazuGlasses = UserDefaults.standard.string(forKey: "pazuGlasses") ?? "None"
+        self.pazuScarf = UserDefaults.standard.string(forKey: "pazuScarf") ?? "None"
+        self.pazuOutfit = UserDefaults.standard.string(forKey: "pazuOutfit") ?? "None"
+        self.pazuAccessory = UserDefaults.standard.string(forKey: "pazuAccessory") ?? "None"
+        self.unlockedPazuItems = UserDefaults.standard.stringArray(forKey: "unlockedPazuItems") ?? ["None"]
+
+        self.gardenTree = UserDefaults.standard.string(forKey: "gardenTree") ?? "Cherry Blossom"
+        self.gardenPond = UserDefaults.standard.string(forKey: "gardenPond") ?? "Small Pond"
+        self.gardenStructure = UserDefaults.standard.string(forKey: "gardenStructure") ?? "None"
+        self.gardenAmbient = UserDefaults.standard.string(forKey: "gardenAmbient") ?? "None"
+        self.unlockedGardenDecorations = UserDefaults.standard.stringArray(forKey: "unlockedGardenDecorations") ?? ["Cherry Blossom", "Small Pond"]
 
         // Load Scroll Sessions
         if let data = UserDefaults.standard.data(forKey: "scrollSessions"),
@@ -164,6 +245,30 @@ class AppState: ObservableObject {
                 LogEntry(timestamp: calendar.date(byAdding: .hour, value: -2, to: Date())!, appName: "TikTok", action: "App Opened", result: "Continued (15 min feed)"),
                 LogEntry(timestamp: calendar.date(byAdding: .hour, value: -4, to: Date())!, appName: "YouTube", action: "App Opened", result: "Resisted / Closed")
             ]
+        }
+    }
+
+    // Autonomous behavior decision machine with lower chance of clumsy (e.g. 5%)
+    func updatePazuBehavior() {
+        if streak == 0 {
+            currentPazuState = .sleeping
+        } else if streak >= 7 {
+            currentPazuState = .proud
+        } else {
+            let roll = Double.random(in: 0...1)
+            if roll < 0.05 { // Lower chance of clumsy (5% instead of 30%)
+                currentPazuState = .clumsy
+            } else if roll < 0.25 {
+                currentPazuState = .playing
+            } else if roll < 0.45 {
+                currentPazuState = .curious
+            } else if roll < 0.60 {
+                currentPazuState = .eating
+            } else if roll < 0.75 {
+                currentPazuState = .meditating
+            } else {
+                currentPazuState = .idle
+            }
         }
     }
 
@@ -196,6 +301,18 @@ class AppState: ObservableObject {
         self.unlockedKoiColors = ["Orange"]
         self.simulatedDaysElapsed = 1
         self.checkedInCount = 4
+        self.currentPazuState = .idle
+        self.pazuHat = "None"
+        self.pazuGlasses = "None"
+        self.pazuScarf = "None"
+        self.pazuOutfit = "None"
+        self.pazuAccessory = "None"
+        self.unlockedPazuItems = ["None"]
+        self.gardenTree = "Cherry Blossom"
+        self.gardenPond = "Small Pond"
+        self.gardenStructure = "None"
+        self.gardenAmbient = "None"
+        self.unlockedGardenDecorations = ["Cherry Blossom", "Small Pond"]
         self.scrollSessions = [
             ScrollSession(startTime: "08:00", endTime: "08:30", isActive: true),
             ScrollSession(startTime: "12:00", endTime: "13:00", isActive: false),
