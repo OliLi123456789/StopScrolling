@@ -81,6 +81,27 @@ struct PazuCharacterView: View {
                     let noseRect = CGRect(x: center.x - 3, y: center.y - 19, width: 6, height: 4)
                     context.fill(Path(ellipseIn: noseRect), with: .color(.inkBlack))
 
+                    // 8b. EQUIPPED COSMETICS (Scarf, Glasses, Hat)
+                    if let scarf = state.pazuScarf, !scarf.isEmpty {
+                        let scarfRect = CGRect(x: center.x - 20, y: center.y - 3, width: 40, height: 10)
+                        context.fill(Path(roundedRect: scarfRect, cornerRadius: 4), with: .color(.terracotta))
+                    }
+                    if let glasses = state.pazuGlasses, !glasses.isEmpty {
+                        var glassesPath = Path()
+                        glassesPath.addEllipse(in: CGRect(x: center.x - 14, y: center.y - 32, width: 10, height: 10))
+                        glassesPath.addEllipse(in: CGRect(x: center.x + 4, y: center.y - 32, width: 10, height: 10))
+                        glassesPath.move(to: CGPoint(x: center.x - 4, y: center.y - 27))
+                        glassesPath.addLine(to: CGPoint(x: center.x + 4, y: center.y - 27))
+                        context.stroke(glassesPath, with: .color(.inkBlack), lineWidth: 1.5)
+                    }
+                    if let hat = state.pazuHat, !hat.isEmpty {
+                        var hatPath = Path()
+                        hatPath.move(to: CGPoint(x: center.x - 22, y: center.y - 42))
+                        hatPath.addLine(to: CGPoint(x: center.x, y: center.y - 62))
+                        hatPath.addLine(to: CGPoint(x: center.x + 22, y: center.y - 42))
+                        context.fill(hatPath, with: .color(.sageGreen))
+                    }
+
                     // 9. LEGS
                     let leg1 = Path(ellipseIn: CGRect(x: center.x - 18, y: center.y + 40, width: 12, height: 8))
                     let leg2 = Path(ellipseIn: CGRect(x: center.x + 6, y: center.y + 40, width: 12, height: 8))
