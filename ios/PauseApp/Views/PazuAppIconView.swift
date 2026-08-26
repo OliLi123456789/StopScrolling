@@ -1,13 +1,15 @@
 import SwiftUI
 
-// PazuAppIconView displays a Shoulders-Up procedural Canvas portrait of Pazu the Red Panda with equipped cosmetics and zero emojis
+// PazuAppIconView displays a Shoulders-Up 32-bit pixel art portrait of Pazu the Red Panda
 struct PazuAppIconView: View {
     @ObservedObject var state: AppState
     var iconSize: CGFloat = 60
 
+    private let gridSize = 32
+
     var body: some View {
         ZStack {
-            // App Icon Squircle Background with Washi Paper / Terracotta border
+            // App Icon Squircle Background
             RoundedRectangle(cornerRadius: iconSize * 0.22, style: .continuous)
                 .fill(
                     LinearGradient(
@@ -21,76 +23,95 @@ struct PazuAppIconView: View {
                         .stroke(Color.paperBorder, lineWidth: 1.5)
                 )
 
-            // Shoulders-Up Procedural Pazu Canvas
+            // Shoulders-Up 32-bit Canvas
             Canvas { context, size in
-                let center = CGPoint(x: size.width / 2, y: size.height / 2 + 6)
+                let pixelSize = size.width / CGFloat(gridSize)
 
-                // Head
-                let headRect = CGRect(x: center.x - 22, y: center.y - 22, width: 44, height: 44)
-                context.fill(Path(ellipseIn: headRect), with: .color(.pazuOrange))
+                func drawPixel(x: Int, y: Int, color: Color) {
+                    let rect = CGRect(
+                        x: CGFloat(x) * pixelSize,
+                        y: CGFloat(y) * pixelSize,
+                        width: pixelSize,
+                        height: pixelSize
+                    )
+                    context.fill(Path(rect), with: .color(color))
+                }
+
+                func drawRect(x: Int, y: Int, w: Int, h: Int, color: Color) {
+                    for px in x..<(x + w) {
+                        for py in y..<(y + h) {
+                            drawPixel(x: px, y: py, color: color)
+                        }
+                    }
+                }
+
+                let orange = Color.pazuOrange
+                let cream = Color.cream
+                let ink = Color.inkBlack
+                let terracotta = Color.terracotta
+                let sage = Color.sageGreen
+
+                // Shoulders / Upper Chest
+                drawRect(x: 8, y: 22, w: 16, h: 10, color: orange)
+                drawRect(x: 13, y: 22, w: 6, h: 8, color: cream)
 
                 // Ears
-                var leftEar = Path()
-                leftEar.move(to: CGPoint(x: center.x - 18, y: center.y - 15))
-                leftEar.addLine(to: CGPoint(x: center.x - 25, y: center.y - 32))
-                leftEar.addLine(to: CGPoint(x: center.x - 8, y: center.y - 20))
-                context.fill(leftEar, with: .color(.pazuOrange))
+                drawRect(x: 7, y: 5, w: 5, h: 6, color: orange)
+                drawRect(x: 8, y: 6, w: 3, h: 4, color: cream)
+                drawRect(x: 20, y: 5, w: 5, h: 6, color: orange)
+                drawRect(x: 21, y: 6, w: 3, h: 4, color: cream)
 
-                var rightEar = Path()
-                rightEar.move(to: CGPoint(x: center.x + 18, y: center.y - 15))
-                rightEar.addLine(to: CGPoint(x: center.x + 25, y: center.y - 32))
-                rightEar.addLine(to: CGPoint(x: center.x + 8, y: center.y - 20))
-                context.fill(rightEar, with: .color(.pazuOrange))
+                // Head
+                drawRect(x: 8, y: 10, w: 16, h: 13, color: orange)
 
-                // White Muzzle / Cheek Mask
-                let muzzleRect = CGRect(x: center.x - 12, y: center.y - 4, width: 24, height: 18)
-                context.fill(Path(ellipseIn: muzzleRect), with: .color(.cream))
-
-                // Eyes (Vector expression based on state)
-                if state.currentPazuState == .happy || state.currentPazuState == .proud {
-                    var eyePath = Path()
-                    eyePath.move(to: CGPoint(x: center.x - 12, y: center.y - 8))
-                    eyePath.addQuadCurve(to: CGPoint(x: center.x - 6, y: center.y - 8), control: CGPoint(x: center.x - 9, y: center.y - 12))
-                    eyePath.move(to: CGPoint(x: center.x + 6, y: center.y - 8))
-                    eyePath.addQuadCurve(to: CGPoint(x: center.x + 12, y: center.y - 8), control: CGPoint(x: center.x + 9, y: center.y - 12))
-                    context.stroke(eyePath, with: .color(.inkBlack), lineWidth: 2)
-                } else if state.currentPazuState == .sleeping {
-                    var eyePath = Path()
-                    eyePath.move(to: CGPoint(x: center.x - 12, y: center.y - 8))
-                    eyePath.addLine(to: CGPoint(x: center.x - 6, y: center.y - 8))
-                    eyePath.move(to: CGPoint(x: center.x + 6, y: center.y - 8))
-                    eyePath.addLine(to: CGPoint(x: center.x + 12, y: center.y - 8))
-                    context.stroke(eyePath, with: .color(.inkBlack), lineWidth: 2)
-                } else {
-                    let leftEye = CGRect(x: center.x - 11, y: center.y - 10, width: 5, height: 5)
-                    let rightEye = CGRect(x: center.x + 6, y: center.y - 10, width: 5, height: 5)
-                    context.fill(Path(ellipseIn: leftEye), with: .color(.inkBlack))
-                    context.fill(Path(ellipseIn: rightEye), with: .color(.inkBlack))
-                }
+                // Cream Muzzle & Cheeks
+                drawRect(x: 11, y: 16, w: 10, h: 6, color: cream)
+                drawRect(x: 9, y: 17, w: 14, h: 4, color: cream)
 
                 // Nose
-                let noseRect = CGRect(x: center.x - 3, y: center.y + 1, width: 6, height: 4)
-                context.fill(Path(ellipseIn: noseRect), with: .color(.inkBlack))
+                drawRect(x: 15, y: 16, w: 2, h: 2, color: ink)
 
-                // EQUIPPED COSMETICS (Scarf, Glasses, Hat)
-                if let scarf = state.pazuScarf, !scarf.isEmpty {
-                    let scarfRect = CGRect(x: center.x - 18, y: center.y + 12, width: 36, height: 8)
-                    context.fill(Path(roundedRect: scarfRect, cornerRadius: 3), with: .color(.terracotta))
+                // Eyes (Vector state)
+                if state.currentPazuState == .happy || state.currentPazuState == .proud {
+                    drawPixel(x: 11, y: 14, color: ink)
+                    drawPixel(x: 12, y: 13, color: ink)
+                    drawPixel(x: 13, y: 14, color: ink)
+                    drawPixel(x: 18, y: 14, color: ink)
+                    drawPixel(x: 19, y: 13, color: ink)
+                    drawPixel(x: 20, y: 14, color: ink)
+                } else if state.currentPazuState == .sleeping {
+                    drawRect(x: 11, y: 14, w: 3, h: 1, color: ink)
+                    drawRect(x: 18, y: 14, w: 3, h: 1, color: ink)
+                } else {
+                    drawRect(x: 11, y: 13, w: 3, h: 3, color: ink)
+                    drawRect(x: 18, y: 13, w: 3, h: 3, color: ink)
+                    drawPixel(x: 12, y: 13, color: Color.pureWhite)
+                    drawPixel(x: 19, y: 13, color: Color.pureWhite)
                 }
-                if let glasses = state.pazuGlasses, !glasses.isEmpty {
-                    var glassesPath = Path()
-                    glassesPath.addEllipse(in: CGRect(x: center.x - 14, y: center.y - 12, width: 10, height: 10))
-                    glassesPath.addEllipse(in: CGRect(x: center.x + 4, y: center.y - 12, width: 10, height: 10))
-                    glassesPath.move(to: CGPoint(x: center.x - 4, y: center.y - 7))
-                    glassesPath.addLine(to: CGPoint(x: center.x + 4, y: center.y - 7))
-                    context.stroke(glassesPath, with: .color(.inkBlack), lineWidth: 1.5)
+
+                // EQUIPPED ACCESSORIES IN APP ICON
+                // Scarf
+                if !state.pazuScarf.isEmpty && state.pazuScarf != "None" {
+                    drawRect(x: 9, y: 21, w: 14, h: 3, color: terracotta)
+                    drawRect(x: 18, y: 23, w: 3, h: 5, color: terracotta)
                 }
-                if let hat = state.pazuHat, !hat.isEmpty {
-                    var hatPath = Path()
-                    hatPath.move(to: CGPoint(x: center.x - 20, y: center.y - 22))
-                    hatPath.addLine(to: CGPoint(x: center.x, y: center.y - 38))
-                    hatPath.addLine(to: CGPoint(x: center.x + 20, y: center.y - 22))
-                    context.fill(hatPath, with: .color(.sageGreen))
+                // Glasses
+                if !state.pazuGlasses.isEmpty && state.pazuGlasses != "None" {
+                    drawRect(x: 10, y: 12, w: 5, h: 5, color: ink)
+                    drawRect(x: 11, y: 13, w: 3, h: 3, color: cream.opacity(0.8))
+                    drawRect(x: 17, y: 12, w: 5, h: 5, color: ink)
+                    drawRect(x: 18, y: 13, w: 3, h: 3, color: cream.opacity(0.8))
+                    drawRect(x: 14, y: 13, w: 4, h: 1, color: ink)
+                }
+                // Hat
+                if !state.pazuHat.isEmpty && state.pazuHat != "None" {
+                    if state.pazuHat == "Leaf Crown" {
+                        drawRect(x: 12, y: 7, w: 8, h: 3, color: sage)
+                        drawPixel(x: 15, y: 6, color: sage)
+                    } else {
+                        drawRect(x: 6, y: 8, w: 20, h: 2, color: sage)
+                        drawRect(x: 10, y: 3, w: 12, h: 5, color: sage)
+                    }
                 }
             }
         }

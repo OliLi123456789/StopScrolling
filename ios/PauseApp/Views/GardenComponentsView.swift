@@ -1,28 +1,43 @@
 import SwiftUI
 
-// RakedSandView renders Zen garden raked sand with quad curve grooves
+// RakedSandView renders 32-bit pixel-art Zen garden raked sand
 struct RakedSandView: View {
+    private let gridSize = 32
+
     var body: some View {
         Canvas { context, size in
-            // Base sand color (#E8E0D5)
-            let sandRect = CGRect(origin: .zero, size: size)
-            context.fill(Path(sandRect), with: .color(Color(hex: "#E8E0D5")))
+            let pixelSize = size.width / CGFloat(gridSize)
 
-            // Draw raked lines
-            for i in 0...8 {
-                let yOffset = CGFloat(i) * 25 + 10
-                var linePath = Path()
-                linePath.move(to: CGPoint(x: 0, y: yOffset))
-                linePath.addQuadCurve(to: CGPoint(x: size.width, y: yOffset + 10),
-                                      control: CGPoint(x: size.width/2, y: yOffset - 20))
-                context.stroke(linePath, with: .color(Color(hex: "#D5CDBF").opacity(0.6)), lineWidth: 2)
+            func drawPixel(x: Int, y: Int, color: Color) {
+                let rect = CGRect(
+                    x: CGFloat(x) * pixelSize,
+                    y: CGFloat(y) * pixelSize,
+                    width: pixelSize,
+                    height: pixelSize
+                )
+                context.fill(Path(rect), with: .color(color))
             }
 
-            // Concentric ripples
-            for i in 1...3 {
-                let radius = CGFloat(i) * 15
-                let circlePath = Path(ellipseIn: CGRect(x: size.width/2 - radius, y: size.height/2 - radius, width: radius*2, height: radius*2))
-                context.stroke(circlePath, with: .color(Color(hex: "#D5CDBF").opacity(0.3)), lineWidth: 1.5, dash: [4, 6])
+            func drawRect(x: Int, y: Int, w: Int, h: Int, color: Color) {
+                for px in x..<(x + w) {
+                    for py in y..<(y + h) {
+                        drawPixel(x: px, y: py, color: color)
+                    }
+                }
+            }
+
+            let sandBase = Color(hex: "#E8E0D5")
+            let sandGroove = Color(hex: "#D5CDBF")
+
+            drawRect(x: 0, y: 0, w: 32, h: 32, color: sandBase)
+
+            // 32-Bit Pixel Rake Grooves
+            for row in [4, 10, 16, 22, 28] {
+                for col in 0..<32 {
+                    if (col + row) % 2 == 0 {
+                        drawPixel(x: col, y: row, color: sandGroove)
+                    }
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: 250)
@@ -30,73 +45,118 @@ struct RakedSandView: View {
     }
 }
 
-// ZenTreeView renders the curved trunk and cherry blossom canopy
+// ZenTreeView renders 32-bit pixel-art trunk and blossom canopy
 struct ZenTreeView: View {
-    var body: some View {
-        ZStack {
-            // Trunk
-            Path { path in
-                path.move(to: CGPoint(x: 50, y: 120))
-                path.addCurve(to: CGPoint(x: 40, y: 40),
-                              control1: CGPoint(x: 45, y: 80),
-                              control2: CGPoint(x: 60, y: 60))
-                path.addCurve(to: CGPoint(x: 30, y: 10),
-                              control1: CGPoint(x: 30, y: 30),
-                              control2: CGPoint(x: 40, y: 20))
-            }
-            .stroke(Color(hex: "#6B4F3A"), lineWidth: 18)
+    private let gridSize = 32
 
-            // Soft Blossom Canopy
-            ForEach(0..<5) { i in
-                let x = CGFloat(i) * 12 + 15
-                let y = CGFloat(i % 3) * 15 + 5
-                Circle()
-                    .fill(Color(hex: "#F5B7B1").opacity(0.85))
-                    .frame(width: 35 + CGFloat(i * 4), height: 35 + CGFloat(i * 4))
-                    .offset(x: x - 30, y: y - 30)
+    var body: some View {
+        Canvas { context, size in
+            let pixelSize = size.width / CGFloat(gridSize)
+
+            func drawPixel(x: Int, y: Int, color: Color) {
+                let rect = CGRect(
+                    x: CGFloat(x) * pixelSize,
+                    y: CGFloat(y) * pixelSize,
+                    width: pixelSize,
+                    height: pixelSize
+                )
+                context.fill(Path(rect), with: .color(color))
             }
+
+            func drawRect(x: Int, y: Int, w: Int, h: Int, color: Color) {
+                for px in x..<(x + w) {
+                    for py in y..<(y + h) {
+                        drawPixel(x: px, y: py, color: color)
+                    }
+                }
+            }
+
+            let wood = Color(hex: "#6B4F3A")
+            let pink = Color(hex: "#F5B7B1")
+
+            // Trunk (32-bit pixel tree trunk)
+            drawRect(x: 14, y: 16, w: 4, h: 16, color: wood)
+            drawRect(x: 12, y: 22, w: 3, h: 10, color: wood)
+            drawRect(x: 17, y: 12, w: 3, h: 8, color: wood)
+
+            // Canopy
+            drawRect(x: 6, y: 4, w: 18, h: 12, color: pink)
+            drawRect(x: 4, y: 6, w: 22, h: 8, color: pink)
         }
         .frame(width: 140, height: 120)
     }
 }
 
-// KoiPondView renders serene water base and animated ripple ovals
+// KoiPondView renders 32-bit pixel-art koi pond
 struct KoiPondView: View {
-    @State private var ripplePhase: CGFloat = 0
+    private let gridSize = 32
 
     var body: some View {
-        ZStack {
-            // Water base
-            Ellipse()
-                .fill(
-                    LinearGradient(gradient: Gradient(colors: [Color(hex: "#68A2B9"), Color(hex: "#4A7C8C")]), startPoint: .top, endPoint: .bottom)
-                )
-                .frame(width: 110, height: 60)
+        Canvas { context, size in
+            let pixelSize = size.width / CGFloat(gridSize)
 
-            // Ripples
-            ForEach(0..<2) { i in
-                Ellipse()
-                    .stroke(Color.white.opacity(0.4), lineWidth: 1)
-                    .frame(width: 35 + ripplePhase * 15, height: 18 + ripplePhase * 8)
+            func drawPixel(x: Int, y: Int, color: Color) {
+                let rect = CGRect(
+                    x: CGFloat(x) * pixelSize,
+                    y: CGFloat(y) * pixelSize,
+                    width: pixelSize,
+                    height: pixelSize
+                )
+                context.fill(Path(rect), with: .color(color))
             }
-        }
-        .onAppear {
-            withAnimation(Animation.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
-                ripplePhase = 1.0
+
+            func drawRect(x: Int, y: Int, w: Int, h: Int, color: Color) {
+                for px in x..<(x + w) {
+                    for py in y..<(y + h) {
+                        drawPixel(x: px, y: py, color: color)
+                    }
+                }
             }
+
+            let water = Color(hex: "#68A2B9")
+            let ripple = Color(hex: "#81B29A")
+
+            drawRect(x: 4, y: 8, w: 24, h: 16, color: water)
+            drawRect(x: 8, y: 12, w: 16, h: 8, color: ripple.opacity(0.8))
         }
+        .frame(width: 110, height: 60)
     }
 }
 
-// BambooGroveView renders background bamboo stalks
+// BambooGroveView renders 32-bit pixel-art bamboo stalks
 struct BambooGroveView: View {
+    private let gridSize = 32
+
     var body: some View {
-        HStack(spacing: 12) {
-            ForEach(0..<4, id: \.self) { _ in
-                Capsule()
-                    .fill(Color.sageGreen.opacity(0.4))
-                    .frame(width: 6, height: 80)
+        Canvas { context, size in
+            let pixelSize = size.width / CGFloat(gridSize)
+
+            func drawPixel(x: Int, y: Int, color: Color) {
+                let rect = CGRect(
+                    x: CGFloat(x) * pixelSize,
+                    y: CGFloat(y) * pixelSize,
+                    width: pixelSize,
+                    height: pixelSize
+                )
+                context.fill(Path(rect), with: .color(color))
+            }
+
+            func drawRect(x: Int, y: Int, w: Int, h: Int, color: Color) {
+                for px in x..<(x + w) {
+                    for py in y..<(y + h) {
+                        drawPixel(x: px, y: py, color: color)
+                    }
+                }
+            }
+
+            let bamboo = Color.sageGreen
+
+            for stalk in [4, 12, 20, 28] {
+                drawRect(x: stalk, y: 0, w: 2, h: 32, color: bamboo)
+                drawRect(x: stalk - 1, y: 10, w: 4, h: 1, color: bamboo)
+                drawRect(x: stalk - 1, y: 22, w: 4, h: 1, color: bamboo)
             }
         }
+        .frame(width: 80, height: 80)
     }
 }

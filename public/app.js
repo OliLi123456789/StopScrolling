@@ -383,7 +383,7 @@ function triggerHardwareBypass() {
     renderCurrentScreen();
 }
 
-// Render Pazu Red Panda Shoulders-Up App Icon Frame (NO EMOJIS)
+// Render Pazu Red Panda Shoulders-Up App Icon Frame in 32-Bit Pixel-Art Style (NO EMOJIS)
 function renderPazuCharacter() {
     let pazuActionText = 'Pazu is resting in the Zen Garden';
 
@@ -420,17 +420,100 @@ function renderPazuCharacter() {
             break;
     }
 
+    // Draw 32-Bit Pixel Art Pazu Canvas HTML
+    setTimeout(() => {
+        const canvas = document.getElementById('pazu-pixel-canvas');
+        if (canvas && canvas.getContext) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 128, 128);
+            const pixelSize = 4; // 128 / 32 = 4px per grid unit
+
+            function drawPixel(x, y, color) {
+                ctx.fillStyle = color;
+                ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+            }
+
+            function drawRect(x, y, w, h, color) {
+                for (let px = x; px < x + w; px++) {
+                    for (let py = y; py < y + h; py++) {
+                        drawPixel(px, py, color);
+                    }
+                }
+            }
+
+            const orange = '#E07A5F';
+            const cream = '#FDF1E7';
+            const ink = '#2B2D42';
+            const sage = '#81B29A';
+
+            // 32-bit Pazu Shoulders-Up
+            drawRect(8, 22, 16, 10, orange);
+            drawRect(13, 22, 6, 8, cream);
+
+            // Ears
+            drawRect(7, 5, 5, 6, orange);
+            drawRect(8, 6, 3, 4, cream);
+            drawRect(20, 5, 5, 6, orange);
+            drawRect(21, 6, 3, 4, cream);
+
+            // Head
+            drawRect(8, 10, 16, 13, orange);
+            drawRect(11, 16, 10, 6, cream);
+            drawRect(9, 17, 14, 4, cream);
+
+            // Nose
+            drawRect(15, 16, 2, 2, ink);
+
+            // Eyes
+            if (state.pazuState === 'happy' || state.pazuState === 'proud') {
+                drawPixel(11, 14, ink);
+                drawPixel(12, 13, ink);
+                drawPixel(13, 14, ink);
+                drawPixel(18, 14, ink);
+                drawPixel(19, 13, ink);
+                drawPixel(20, 14, ink);
+            } else if (state.pazuState === 'sleeping') {
+                drawRect(11, 14, 3, 1, ink);
+                drawRect(18, 14, 3, 1, ink);
+            } else {
+                drawRect(11, 13, 3, 3, ink);
+                drawRect(18, 13, 3, 3, ink);
+                drawPixel(12, 13, '#FFFFFF');
+                drawPixel(19, 13, '#FFFFFF');
+            }
+
+            // Accessories
+            if (state.pazuScarf && state.pazuScarf !== 'None') {
+                drawRect(9, 21, 14, 3, '#E07A5F');
+                drawRect(18, 23, 3, 5, '#E07A5F');
+            }
+            if (state.pazuGlasses && state.pazuGlasses !== 'None') {
+                drawRect(10, 12, 5, 5, ink);
+                drawRect(11, 13, 3, 3, cream);
+                drawRect(17, 12, 5, 5, ink);
+                drawRect(18, 13, 3, 3, cream);
+                drawRect(14, 13, 4, 1, ink);
+            }
+            if (state.pazuHat && state.pazuHat !== 'None') {
+                if (state.pazuHat === 'Leaf Crown') {
+                    drawRect(12, 7, 8, 3, sage);
+                    drawPixel(15, 6, sage);
+                } else {
+                    drawRect(6, 8, 20, 2, sage);
+                    drawRect(10, 3, 12, 5, sage);
+                }
+            }
+        }
+    }, 50);
+
     return `
         <div class="relative w-48 h-48 bg-[#FFFFFF] border border-[#E8E4D9] rounded-3xl mx-auto flex flex-col items-center justify-center overflow-hidden shadow-lg p-2">
-            <!-- Washi Paper Shoulders-Up App Icon Squircle Container -->
+            <!-- Washi Paper Shoulders-Up 32-Bit Pixel App Icon Container -->
             <div class="z-10 flex flex-col items-center text-center">
-                <div class="relative w-20 h-20 bg-[#F8F6F0] border-2 border-[#E07A5F] rounded-2xl flex items-center justify-center shadow-md">
-                    <!-- Procedural Vector Icon Representation -->
-                    <div class="w-12 h-12 rounded-full bg-[#E07A5F] flex items-center justify-center border-2 border-[#FFFFFF]">
-                        <i data-lucide="smile" class="w-7 h-7 text-white"></i>
-                    </div>
+                <div class="relative w-20 h-20 bg-[#F8F6F0] border-2 border-[#E07A5F] rounded-2xl flex items-center justify-center shadow-md overflow-hidden">
+                    <canvas id="pazu-pixel-canvas" width="128" height="128" class="w-full h-full object-contain image-rendering-pixelated"></canvas>
                 </div>
-                <div class="text-xs font-black text-[#2B2D42] mt-2 tracking-wide">Pazu App Icon</div>
+                <div class="text-xs font-black text-[#2B2D42] mt-2 tracking-wide">32-Bit Pazu App Icon</div>
                 <div class="text-[10px] text-[#E07A5F] font-semibold px-2 leading-tight mt-0.5">${pazuActionText}</div>
             </div>
         </div>
