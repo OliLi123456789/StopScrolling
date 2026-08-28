@@ -1004,13 +1004,13 @@ function renderCurrentScreen() {
                             <span class="absolute right-4 top-4 text-[9px] bg-[#E07A5F]/10 text-[#E07A5F] px-1.5 py-0.5 rounded-full font-bold">BEST VALUE</span>
                             <div class="text-xs font-black text-[#2B2D42]">Annual Membership</div>
                             <div class="text-lg font-extrabold text-[#2B2D42] mt-0.5">$39.99 <span class="text-xs font-normal text-[#8D8F9A]">/ year</span></div>
-                            <p class="text-[10px] text-[#8D8F9A] mt-1">7-Day Free Trial included. Standard Apple StoreKit native purchase.</p>
+                            <p class="text-[10px] text-[#8D8F9A] mt-1">1-Month Free Trial included. Standard Apple StoreKit native purchase.</p>
                         </button>
                     </div>
 
                     <div class="space-y-3">
                         <button onclick="upgradeToPremium(39.99, 'Annual')" class="w-full bg-[#E07A5F] text-white font-bold py-3 px-4 rounded-full text-xs transition-all flex items-center justify-center gap-1.5">
-                            <i data-lucide="credit-card" class="w-4 h-4"></i> Start 7-Day Free Trial
+                            <i data-lucide="credit-card" class="w-4 h-4"></i> Start 1-Month Free Trial
                         </button>
                     </div>
                 </div>
@@ -1140,7 +1140,7 @@ function toggleQuietHours() {
 function upgradeToPremium(price, tier) {
     state.hasPremium = true;
     saveState();
-    logAction('Premium Subscribed', `Upgraded to Pause Pro Annual Plan ($39.99/yr)`);
+    logAction('Premium Subscribed', `Upgraded to Pause Pro Annual Plan with 1-Month Free Trial ($39.99/yr)`);
     triggerSandboxCelebrationSparkles();
     renderCurrentScreen();
 }
